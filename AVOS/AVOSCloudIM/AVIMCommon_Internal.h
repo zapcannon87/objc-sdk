@@ -8,6 +8,15 @@
 
 #import "AVIMCommon.h"
 
+#if DEBUG
+void assertContextOfQueue(dispatch_queue_t queue, BOOL isRunIn);
+#define AssertRunInQueue(queue) assertContextOfQueue(queue, true);
+#define AssertNotRunInQueue(queue) assertContextOfQueue(queue, false);
+#else
+#define AssertRunInQueue(queue)
+#define AssertNotRunInQueue(queue)
+#endif
+
 /// { kAVIMUserOptionUseUnread: true } support unread notification feature. use `lc.protobuf2.3`
 /// { kAVIMUserOptionUseUnread: false } not support unread notification feature. use `lc.protobuf2.1`
 static NSString * const kAVIMUserOptionUseUnread = @"AVIMUserOptionUseUnread";
@@ -18,7 +27,7 @@ static NSString * const kClientTagDefault = @"default";
 static NSString * const kTemporaryConversationIdPrefix = @"_tmp:";
 
 /// @see https://github.com/leancloud/avoscloud-push/blob/develop/push-server/doc/protocol.md
-typedef NS_OPTIONS(NSUInteger, LCIMSessionConfigOptions) {
+typedef NS_OPTIONS(int64_t, LCIMSessionConfigOptions) {
     LCIMSessionConfigOptions_Patch = 1 << 0,
     LCIMSessionConfigOptions_TempConv = 1 << 1,
     LCIMSessionConfigOptions_AutoBindInstallation = 1 << 2,
@@ -27,6 +36,35 @@ typedef NS_OPTIONS(NSUInteger, LCIMSessionConfigOptions) {
     LCIMSessionConfigOptions_CallbackResultSlice = 1 << 5,
     LCIMSessionConfigOptions_GroupChatReadReceipt = 1 << 6,
 };
+
+/// RTM events notification type
+typedef NSString * const RTMNotificationType NS_TYPED_EXTENSIBLE_ENUM;
+static RTMNotificationType RTMNotificationTypePermanent = @"permanent";
+static RTMNotificationType RTMNotificationTypeDroppable = @"droppable";
+
+/// RTM events notification key
+typedef NSString * const RTMNotificationKey NS_TYPED_EXTENSIBLE_ENUM;
+static RTMNotificationKey RTMNotificationKeyNotifications = @"notifications";
+static RTMNotificationKey RTMNotificationKeyInvalidLocalConvCache = @"invalidLocalConvCache";
+static RTMNotificationKey RTMNotificationKeyHasMore = @"hasMore";
+static RTMNotificationKey RTMNotificationKeyCmd = @"cmd";
+static RTMNotificationKey RTMNotificationKeyOp = @"op";
+static RTMNotificationKey RTMNotificationKeyCmdConv = @"conv";
+static RTMNotificationKey RTMNotificationKeyCmdRcp = @"rcp";
+static RTMNotificationKey RTMNotificationKeyOpJoined = @"joined";
+static RTMNotificationKey RTMNotificationKeyOpLeft = @"left";
+static RTMNotificationKey RTMNotificationKeyOpMembersJoined = @"members-joined";
+static RTMNotificationKey RTMNotificationKeyOpMembersLeft = @"members-left";
+static RTMNotificationKey RTMNotificationKeyOpShutuped = @"shutuped";
+static RTMNotificationKey RTMNotificationKeyOpUnshutuped = @"unshutuped";
+static RTMNotificationKey RTMNotificationKeyOpMembersShutuped = @"members-shutuped";
+static RTMNotificationKey RTMNotificationKeyOpMembersUnshutuped = @"members-unshutuped";
+static RTMNotificationKey RTMNotificationKeyOpBlocked = @"blocked";
+static RTMNotificationKey RTMNotificationKeyOpUnblocked = @"unblocked";
+static RTMNotificationKey RTMNotificationKeyOpMembersBlocked = @"members-blocked";
+static RTMNotificationKey RTMNotificationKeyOpMembersUnblocked = @"members-unblocked";
+static RTMNotificationKey RTMNotificationKeyOpUpdated = @"updated";
+static RTMNotificationKey RTMNotificationKeyOpMemberInfoChanged = @"member-info-changed";
 
 /// conversation property key
 typedef NSString * const AVIMConversationKey NS_TYPED_EXTENSIBLE_ENUM;
