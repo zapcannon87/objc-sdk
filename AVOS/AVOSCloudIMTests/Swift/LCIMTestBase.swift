@@ -52,10 +52,12 @@ extension LCIMTestBase {
         tag: String? = nil,
         delegate: AVIMClientDelegate? = nil,
         installation: AVInstallation = AVInstallation.default(),
-        openOption: AVIMClientOpenOption = .forceOpen
+        openOption: AVIMClientOpenOption = .forceOpen,
+        notification: Bool = false
         ) -> AVIMClient?
     {
         var client: AVIMClient! = AVIMClient(clientId: clientId, tag: tag, installation: installation)
+        client.offLineEventsNotificationEnabled = notification
         if let delegate: AVIMClientDelegate = delegate {
             client.delegate = delegate
         }

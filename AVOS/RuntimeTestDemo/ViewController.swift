@@ -180,12 +180,18 @@ extension ViewController {
         }
     }
     
+    @objc func openClient() {
+        self.client.open { (_, _) in
+            
+        }
+    }
+    
 }
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 7
+        return 8
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -205,6 +211,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             cell.textLabel?.text = "\(#selector(self.deleteFile(with:)))"
         case 6:
             cell.textLabel?.text = "\(#selector(self.liveQuery1UnsubscribeFile))"
+        case 7:
+            cell.textLabel?.text = "\(#selector(self.openClient))"
         default:
             fatalError()
         }
@@ -240,6 +248,8 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             self.present(alert, animated: true, completion: nil)
         case 6:
             self.liveQuery1UnsubscribeFile()
+        case 7:
+            self.openClient()
         default:
             fatalError()
         }

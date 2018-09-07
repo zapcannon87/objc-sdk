@@ -340,4 +340,136 @@ class AVIMClientTestCase: LCIMTestBase {
         }, failure: { XCTFail("timeout") })
     }
     
+    func tests_notification() {
+        
+        let clientId: String = String(#function[..<#function.index(of: "(")!]) + "1"
+        
+        guard let client: AVIMClient = LCIMTestBase.newOpenedClient(clientId: clientId, notification: true) else {
+            XCTFail()
+            return
+        }
+        
+        RunLoopSemaphore.wait(async: { (semaphore: RunLoopSemaphore) in
+            semaphore.increment()
+            client.addOperation(toInternalSerialQueue: { (client: AVIMClient?) in
+                XCTAssertNotNil(client)
+                client?.getSessionToken(withForcingRefresh: false, callback: { (sessionToken: String?, error: Error?) in
+                    XCTAssertNotNil(sessionToken)
+                    XCTAssertNil(error)
+                    client?.fetchRTMNotifications(withSessionToken: sessionToken, clientId: clientId, timestamp: 0, notificationType: nil, callback: { (data: [AnyHashable : Any]?, error: Error?) in
+                        semaphore.decrement()
+                        XCTAssertNotNil(data)
+                        let permanent: [AnyHashable : Any]? = data?[RTMNotificationType.permanent.rawValue] as? [AnyHashable : Any]
+                        let droppable: [AnyHashable : Any]? = data?[RTMNotificationType.droppable.rawValue] as? [AnyHashable : Any]
+                        XCTAssertNotNil(permanent)
+                        XCTAssertNotNil(droppable)
+                        XCTAssertNotNil(permanent?[RTMNotificationKey.hasMore.rawValue])
+                        XCTAssertNotNil(permanent?[RTMNotificationKey.notifications.rawValue])
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.hasMore.rawValue])
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.notifications.rawValue])
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.invalidLocalConvCache.rawValue])
+                        XCTAssertNil(error)
+                    })
+                })
+            })
+        }, failure: { XCTFail("timeout") })
+        
+        RunLoopSemaphore.wait(async: { (semaphore: RunLoopSemaphore) in
+            semaphore.increment()
+            client.addOperation(toInternalSerialQueue: { (client: AVIMClient?) in
+                XCTAssertNotNil(client)
+                client?.getSessionToken(withForcingRefresh: false, callback: { (sessionToken: String?, error: Error?) in
+                    XCTAssertNotNil(sessionToken)
+                    XCTAssertNil(error)
+                    client?.fetchRTMNotifications(withSessionToken: sessionToken, clientId: clientId, timestamp: 0, notificationType: .permanent, callback: { (permanent: [AnyHashable : Any]?, error: Error?) in
+                        semaphore.decrement()
+                        XCTAssertNotNil(permanent)
+                        XCTAssertNotNil(permanent?[RTMNotificationKey.hasMore.rawValue])
+                        XCTAssertNotNil(permanent?[RTMNotificationKey.notifications.rawValue])
+                        XCTAssertNil(error)
+                    })
+                })
+            })
+        }, failure: { XCTFail("timeout") })
+        
+        RunLoopSemaphore.wait(async: { (semaphore: RunLoopSemaphore) in
+            semaphore.increment()
+            client.addOperation(toInternalSerialQueue: { (client: AVIMClient?) in
+                XCTAssertNotNil(client)
+                client?.getSessionToken(withForcingRefresh: false, callback: { (sessionToken: String?, error: Error?) in
+                    XCTAssertNotNil(sessionToken)
+                    XCTAssertNil(error)
+                    client?.fetchRTMNotifications(withSessionToken: sessionToken, clientId: clientId, timestamp: 0, notificationType: .droppable, callback: { (droppable: [AnyHashable : Any]?, error: Error?) in
+                        semaphore.decrement()
+                        XCTAssertNotNil(droppable)
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.hasMore.rawValue])
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.notifications.rawValue])
+                        XCTAssertNotNil(droppable?[RTMNotificationKey.invalidLocalConvCache.rawValue])
+                        XCTAssertNil(error)
+                    })
+                })
+            })
+        }, failure: { XCTFail("timeout") })
+    }
+    
+    // MARK: - Client Testing
+    
+    func testc_notification() {
+        
+        if self.isServerTesting { return }
+        
+        let clientId1: String = String(#function[..<#function.index(of: "(")!]) + "1"
+        let clientId2: String = String(#function[..<#function.index(of: "(")!]) + "2"
+        
+        guard let client1: AVIMClient = LCIMTestBase.newOpenedClient(clientId: clientId1, notification: true) else {
+            XCTFail()
+            return
+        }
+        
+        guard let convsation: AVIMConversation = LCIMTestBase.newConversation(client: client1, clientIds: [clientId1, clientId2]) else {
+            XCTFail()
+            return
+        }
+        
+        RunLoopSemaphore.wait(async: { (semaphore: RunLoopSemaphore) in
+            convsation[AVIMConversationKey.name.rawValue] = "name"
+            semaphore.increment()
+            convsation.update(callback: { (succeeded: Bool, error: Error?) in
+                XCTAssertTrue(Thread.isMainThread)
+                semaphore.decrement()
+                XCTAssertTrue(succeeded)
+                XCTAssertNil(error)
+            })
+        }, failure: { XCTFail("timeout") })
+        
+        let client2: AVIMClient = AVIMClient(clientId: clientId2)
+        let delegate2: AVIMClientDelegateWrapper = AVIMClientDelegateWrapper()
+        client2.delegate = delegate2
+        client2.offLineEventsNotificationEnabled = true
+        
+        RunLoopSemaphore.wait(async: { (semaphore: RunLoopSemaphore) in
+            semaphore.increment(3)
+            delegate2.invitedByClosure = { (conv: AVIMConversation, clientId: String?) in
+                XCTAssertTrue(Thread.isMainThread)
+                if conv.conversationId == convsation.conversationId {
+                    semaphore.decrement()
+                    XCTAssertEqual(clientId, clientId1)
+                }
+            }
+            delegate2.updateByClosure = { (conv: AVIMConversation, date: Date?, clientId: String?, data: [AnyHashable : Any]?) in
+                XCTAssertTrue(Thread.isMainThread)
+                if conv.conversationId == convsation.conversationId {
+                    semaphore.decrement()
+                    XCTAssertNotNil(date)
+                    XCTAssertEqual(clientId, clientId1)
+                    XCTAssertEqual(data?[AVIMConversationKey.name.rawValue] as? String, "name")
+                }
+            }
+            client2.open(callback: { (succeeded: Bool, error: Error?) in
+                XCTAssertTrue(Thread.isMainThread)
+                semaphore.decrement()
+            })
+        }, failure: { XCTFail("timeout") })
+    }
+    
 }
