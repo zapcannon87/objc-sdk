@@ -62,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nullable) NSString *tag;
 
 /**
+ The Status of this Client.
+ */
+@property (nonatomic, assign, readonly) AVIMClientStatus status;
+
+/**
  控制是否打开历史消息查询本地缓存的功能, 默认开启
  */
 @property (nonatomic, assign) BOOL messageQueryCacheEnabled;
@@ -109,11 +114,6 @@ NS_ASSUME_NONNULL_BEGIN
  @return Instance.
  */
 - (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag LC_WARN_UNUSED_RESULT;
-
-/**
- The Status of this Client.
- */
-- (AVIMClientStatus)status LC_WARN_UNUSED_RESULT;
 
 /**
  Start a Session with Server.

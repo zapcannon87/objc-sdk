@@ -14,15 +14,6 @@
 @class AVIMClientInternalConversationManager;
 @class AVIMClientPushManager;
 
-#if DEBUG
-void assertContextOfQueue(dispatch_queue_t queue, BOOL isRunIn);
-#define AssertRunInQueue(queue) assertContextOfQueue(queue, true);
-#define AssertNotRunInQueue(queue) assertContextOfQueue(queue, false);
-#else
-#define AssertRunInQueue(queue)
-#define AssertNotRunInQueue(queue)
-#endif
-
 @interface AVIMClient () <AVIMWebSocketWrapperDelegate>
 
 @property (nonatomic, strong, readonly) dispatch_queue_t internalSerialQueue;
@@ -32,6 +23,8 @@ void assertContextOfQueue(dispatch_queue_t queue, BOOL isRunIn);
 @property (nonatomic, strong, readonly) AVIMClientInternalConversationManager *conversationManager;
 @property (nonatomic, strong, readonly) AVIMClientPushManager *pushManager;
 @property (nonatomic, strong, readonly) LCIMConversationCache *conversationCache;
+
+@property (nonatomic, assign) BOOL offLineEventsNotificationEnabled;
 
 + (NSMutableDictionary *)sessionProtocolOptions;
 
@@ -57,5 +50,11 @@ void assertContextOfQueue(dispatch_queue_t queue, BOOL isRunIn);
                                  callback:(void (^)(NSString *sessionToken, NSError *error))callback;
 
 - (void)conversation:(AVIMConversation *)conversation didUpdateForKeys:(NSArray<AVIMConversationUpdatedKey> *)keys;
+
+- (void)fetchRTMNotificationsWithSessionToken:(NSString *)sessionToken
+                                     clientId:(NSString *)clientId
+                                    timestamp:(int64_t)timestamp
+                             notificationType:(RTMNotificationType)notificationType
+                                     callback:(void (^)(NSDictionary *dictionary, NSError *error))callback;
 
 @end
