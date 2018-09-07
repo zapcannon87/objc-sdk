@@ -3168,13 +3168,10 @@ static void process_attr_and_attrModified(NSDictionary *attr, NSDictionary *attr
     return patchMessage;
 }
 
-- (AVIMMessage *)process_rcp:(AVIMRcpCommand *)rcpCommand isReadRcp:(BOOL)isReadRcp
+- (AVIMMessage *)process_rcp:(NSString *)messageId timestamp:(int64_t)timestamp isReadRcp:(BOOL)isReadRcp
 {
     AVIMClient *client = self->_imClient;
     AssertRunInQueue(self->_internalSerialQueue);
-    
-    NSString *messageId = (rcpCommand.hasId_p ? rcpCommand.id_p : nil);
-    int64_t timestamp = (rcpCommand.hasT ? rcpCommand.t : 0);
     
     __block AVIMMessage *message = nil;
     if (messageId && !isReadRcp) {
