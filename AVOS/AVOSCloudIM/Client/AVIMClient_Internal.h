@@ -13,6 +13,7 @@
 @class LCIMConversationCache;
 @class AVIMClientInternalConversationManager;
 @class AVIMClientPushManager;
+@class AVIMSignature;
 
 @interface AVIMClient () <AVIMWebSocketWrapperDelegate>
 
@@ -39,7 +40,6 @@
 - (void)addOperationToInternalSerialQueue:(void (^)(AVIMClient *client))block;
 
 - (void)sendCommandWrapper:(LCIMProtobufCommandWrapper *)commandWrapper;
-- (void)sendCommand:(AVIMGenericCommand *)command;
 
 - (void)getSignatureWithConversationId:(NSString *)conversationId
                                 action:(AVIMSignatureAction)action
