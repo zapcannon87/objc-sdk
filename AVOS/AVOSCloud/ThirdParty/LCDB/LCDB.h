@@ -1,3 +1,5 @@
+#import <Foundation/Foundation.h>
+
 #import "LCDatabase.h"
 #import "LCResultSet.h"
 #import "LCDatabaseAdditions.h"

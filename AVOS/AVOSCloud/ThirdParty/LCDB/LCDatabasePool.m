@@ -1,15 +1,26 @@
 //
-//  FMDatabasePool.m
+//  LCDatabasePool.m
 //  fmdb
 //
 //  Created by August Mueller on 6/22/11.
 //  Copyright 2011 Flying Meat Inc. All rights reserved.
 //
 
+#if LCDB_SQLITE_STANDALONE
+#import <sqlite3/sqlite3.h>
+#else
+#import <sqlite3.h>
+#endif
+
 #import "LCDatabasePool.h"
 #import "LCDatabase.h"
 
-@interface LCDatabasePool()
+@interface LCDatabasePool () {
+    dispatch_queue_t    _lockQueue;
+    
+    NSMutableArray      *_databaseInPool;
+    NSMutableArray      *_databaseOutPool;
+}
 
 - (void)pushDatabaseBackInPool:(LCDatabase*)db;
 - (LCDatabase*)db;
@@ -24,49 +35,77 @@
 @synthesize openFlags=_openFlags;
 
 
-+ (instancetype)databasePoolWithPath:(NSString*)aPath {
-    return FMDBReturnAutoreleased([[self alloc] initWithPath:aPath]);
++ (instancetype)databasePoolWithPath:(NSString *)aPath {
+    return LCDBReturnAutoreleased([[self alloc] initWithPath:aPath]);
 }
 
-+ (instancetype)databasePoolWithPath:(NSString*)aPath flags:(int)openFlags {
-    return FMDBReturnAutoreleased([[self alloc] initWithPath:aPath flags:openFlags]);
++ (instancetype)databasePoolWithURL:(NSURL *)url {
+    return LCDBReturnAutoreleased([[self alloc] initWithPath:url.path]);
 }
 
-- (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags {
++ (instancetype)databasePoolWithPath:(NSString *)aPath flags:(int)openFlags {
+    return LCDBReturnAutoreleased([[self alloc] initWithPath:aPath flags:openFlags]);
+}
+
++ (instancetype)databasePoolWithURL:(NSURL *)url flags:(int)openFlags {
+    return LCDBReturnAutoreleased([[self alloc] initWithPath:url.path flags:openFlags]);
+}
+
+- (instancetype)initWithURL:(NSURL *)url flags:(int)openFlags vfs:(NSString *)vfsName {
+    return [self initWithPath:url.path flags:openFlags vfs:vfsName];
+}
+
+- (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags vfs:(NSString *)vfsName {
     
     self = [super init];
     
     if (self != nil) {
         _path               = [aPath copy];
-        _lockQueue          = dispatch_queue_create([[NSString stringWithFormat:@"fmdb.%@", self] UTF8String], NULL);
-        _databaseInPool     = FMDBReturnRetained([NSMutableArray array]);
-        _databaseOutPool    = FMDBReturnRetained([NSMutableArray array]);
+        _lockQueue          = dispatch_queue_create([[NSString stringWithFormat:@"lcdb.%@", self] UTF8String], NULL);
+        _databaseInPool     = LCDBReturnRetained([NSMutableArray array]);
+        _databaseOutPool    = LCDBReturnRetained([NSMutableArray array]);
         _openFlags          = openFlags;
+        _vfsName            = [vfsName copy];
     }
     
     return self;
 }
 
-- (instancetype)initWithPath:(NSString*)aPath
-{
+- (instancetype)initWithPath:(NSString *)aPath flags:(int)openFlags {
+    return [self initWithPath:aPath flags:openFlags vfs:nil];
+}
+
+- (instancetype)initWithURL:(NSURL *)url flags:(int)openFlags {
+    return [self initWithPath:url.path flags:openFlags vfs:nil];
+}
+
+- (instancetype)initWithPath:(NSString*)aPath {
     // default flags for sqlite3_open
     return [self initWithPath:aPath flags:SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE];
+}
+
+- (instancetype)initWithURL:(NSURL *)url {
+    return [self initWithPath:url.path];
 }
 
 - (instancetype)init {
     return [self initWithPath:nil];
 }
 
++ (Class)databaseClass {
+    return [LCDatabase class];
+}
 
 - (void)dealloc {
     
     _delegate = 0x00;
-    FMDBRelease(_path);
-    FMDBRelease(_databaseInPool);
-    FMDBRelease(_databaseOutPool);
+    LCDBRelease(_path);
+    LCDBRelease(_databaseInPool);
+    LCDBRelease(_databaseOutPool);
+    LCDBRelease(_vfsName);
     
     if (_lockQueue) {
-        FMDBDispatchQueueRelease(_lockQueue);
+        LCDBDispatchQueueRelease(_lockQueue);
         _lockQueue = 0x00;
     }
 #if ! __has_feature(objc_arc)
@@ -88,7 +127,7 @@
     [self executeLocked:^() {
         
         if ([self->_databaseInPool containsObject:db]) {
-            [[NSException exceptionWithName:@"Database already in pool" reason:@"The FMDatabase being put back into the pool is already present in the pool" userInfo:nil] raise];
+            [[NSException exceptionWithName:@"Database already in pool" reason:@"The LCDatabase being put back into the pool is already present in the pool" userInfo:nil] raise];
         }
         
         [self->_databaseInPool addObject:db];
@@ -122,13 +161,13 @@
                 }
             }
             
-            db = [LCDatabase databaseWithPath:self->_path];
+            db = [[[self class] databaseClass] databaseWithPath:self->_path];
             shouldNotifyDelegate = YES;
         }
         
         //This ensures that the db is opened before returning
 #if SQLITE_VERSION_NUMBER >= 3005000
-        BOOL success = [db openWithFlags:self->_openFlags];
+        BOOL success = [db openWithFlags:self->_openFlags vfs:self->_vfsName];
 #else
         BOOL success = [db open];
 #endif
@@ -196,7 +235,7 @@
     }];
 }
 
-- (void)inDatabase:(void (^)(LCDatabase *db))block {
+- (void)inDatabase:(void (NS_NOESCAPE ^)(LCDatabase *db))block {
     
     LCDatabase *db = [self db];
     
@@ -231,16 +270,16 @@
     [self pushDatabaseBackInPool:db];
 }
 
-- (void)inDeferredTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block {
+- (void)inDeferredTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block {
     [self beginTransaction:YES withBlock:block];
 }
 
-- (void)inTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block {
+- (void)inTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block {
     [self beginTransaction:NO withBlock:block];
 }
+
+- (NSError*)inSavePoint:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block {
 #if SQLITE_VERSION_NUMBER >= 3007000
-- (NSError*)inSavePoint:(void (^)(LCDatabase *db, BOOL *rollback))block {
-    
     static unsigned long savePointIdx = 0;
     
     NSString *name = [NSString stringWithFormat:@"savePoint%ld", savePointIdx++];
@@ -267,7 +306,11 @@
     [self pushDatabaseBackInPool:db];
     
     return err;
-}
+#else
+    NSString *errorMessage = NSLocalizedString(@"Save point functions require SQLite 3.7", nil);
+    if (self.logsErrors) NSLog(@"%@", errorMessage);
+    return [NSError errorWithDomain:@"LCDatabase" code:0 userInfo:@{NSLocalizedDescriptionKey : errorMessage}];
 #endif
+}
 
 @end

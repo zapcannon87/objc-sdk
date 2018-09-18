@@ -2,14 +2,22 @@
 #import "LCDatabase.h"
 #import "unistd.h"
 
+#if LCDB_SQLITE_STANDALONE
+#import <sqlite3/sqlite3.h>
+#else
+#import <sqlite3.h>
+#endif
+
 @interface LCDatabase ()
 - (void)resultSetDidClose:(LCResultSet *)resultSet;
 @end
 
+@interface LCResultSet () {
+    NSMutableDictionary *_columnNameToIndexMap;
+}
+@end
 
 @implementation LCResultSet
-@synthesize query=_query;
-@synthesize statement=_statement;
 
 + (instancetype)resultSetWithStatement:(LCStatement *)statement usingParentDatabase:(LCDatabase*)aDB {
     
@@ -21,21 +29,23 @@
     NSParameterAssert(![statement inUse]);
     [statement setInUse:YES]; // weak reference
     
-    return FMDBReturnAutoreleased(rs);
+    return LCDBReturnAutoreleased(rs);
 }
 
+#if ! __has_feature(objc_arc)
 - (void)finalize {
     [self close];
     [super finalize];
 }
+#endif
 
 - (void)dealloc {
     [self close];
     
-    FMDBRelease(_query);
+    LCDBRelease(_query);
     _query = nil;
     
-    FMDBRelease(_columnNameToIndexMap);
+    LCDBRelease(_columnNameToIndexMap);
     _columnNameToIndexMap = nil;
     
 #if ! __has_feature(objc_arc)
@@ -45,7 +55,7 @@
 
 - (void)close {
     [_statement reset];
-    FMDBRelease(_statement);
+    LCDBRelease(_statement);
     _statement = nil;
     
     // we don't need this anymore... (i think)
@@ -92,7 +102,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-implementations"
 
-- (NSDictionary*)resultDict {
+- (NSDictionary *)resultDict {
     
     NSUInteger num_cols = (NSUInteger)sqlite3_data_count([_statement statement]);
     
@@ -106,7 +116,7 @@
             [dict setObject:objectValue forKey:columnName];
         }
         
-        return FMDBReturnAutoreleased([dict copy]);
+        return LCDBReturnAutoreleased([dict copy]);
     }
     else {
         NSLog(@"Warning: There seem to be no columns in this set.");
@@ -181,7 +191,7 @@
                 // If 'next' or 'nextWithError' is called after the result set is closed,
                 // we need to return the appropriate error.
                 NSDictionary* errorMessage = [NSDictionary dictionaryWithObject:@"parentDB does not exist" forKey:NSLocalizedDescriptionKey];
-                *outErr = [NSError errorWithDomain:@"FMDatabase" code:SQLITE_MISUSE userInfo:errorMessage];
+                *outErr = [NSError errorWithDomain:@"LCDatabase" code:SQLITE_MISUSE userInfo:errorMessage];
             }
             
         }
@@ -211,7 +221,7 @@
     
     NSNumber *n = [[self columnNameToIndexMap] objectForKey:columnName];
     
-    if (n) {
+    if (n != nil) {
         return [n intValue];
     }
     
@@ -219,8 +229,6 @@
     
     return -1;
 }
-
-
 
 - (int)intForColumn:(NSString*)columnName {
     return [self intForColumnIndex:[self columnIndexForName:columnName]];
@@ -270,9 +278,9 @@
     return sqlite3_column_double([_statement statement], columnIdx);
 }
 
-- (NSString*)stringForColumnIndex:(int)columnIdx {
+- (NSString *)stringForColumnIndex:(int)columnIdx {
     
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0) || columnIdx >= sqlite3_column_count([_statement statement])) {
         return nil;
     }
     
@@ -290,13 +298,13 @@
     return [self stringForColumnIndex:[self columnIndexForName:columnName]];
 }
 
-- (NSDate *)dateForColumn:(NSString*)columnName {
+- (NSDate*)dateForColumn:(NSString*)columnName {
     return [self dateForColumnIndex:[self columnIndexForName:columnName]];
 }
 
-- (NSDate *)dateForColumnIndex:(int)columnIdx {
+- (NSDate*)dateForColumnIndex:(int)columnIdx {
     
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0) || columnIdx >= sqlite3_column_count([_statement statement])) {
         return nil;
     }
     
@@ -310,7 +318,7 @@
 
 - (NSData*)dataForColumnIndex:(int)columnIdx {
     
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0) || columnIdx >= sqlite3_column_count([_statement statement])) {
         return nil;
     }
     
@@ -331,7 +339,7 @@
 
 - (NSData*)dataNoCopyForColumnIndex:(int)columnIdx {
     
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0) || columnIdx >= sqlite3_column_count([_statement statement])) {
         return nil;
     }
   
@@ -354,18 +362,26 @@
 
 - (const unsigned char *)UTF8StringForColumnIndex:(int)columnIdx {
     
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0) || columnIdx >= sqlite3_column_count([_statement statement])) {
         return nil;
     }
     
     return sqlite3_column_text([_statement statement], columnIdx);
 }
 
-- (const unsigned char *)UTF8StringForColumnName:(NSString*)columnName {
+- (const unsigned char *)UTF8StringForColumn:(NSString*)columnName {
     return [self UTF8StringForColumnIndex:[self columnIndexForName:columnName]];
 }
 
+- (const unsigned char *)UTF8StringForColumnName:(NSString*)columnName {
+    return [self UTF8StringForColumn:columnName];
+}
+
 - (id)objectForColumnIndex:(int)columnIdx {
+    if (columnIdx < 0 || columnIdx >= sqlite3_column_count([_statement statement])) {
+        return nil;
+    }
+    
     int columnType = sqlite3_column_type([_statement statement], columnIdx);
     
     id returnValue = nil;
@@ -392,6 +408,10 @@
 }
 
 - (id)objectForColumnName:(NSString*)columnName {
+    return [self objectForColumn:columnName];
+}
+
+- (id)objectForColumn:(NSString*)columnName {
     return [self objectForColumnIndex:[self columnIndexForName:columnName]];
 }
 
@@ -400,16 +420,12 @@
     return [NSString stringWithUTF8String: sqlite3_column_name([_statement statement], columnIdx)];
 }
 
-- (void)setParentDB:(LCDatabase *)newDb {
-    _parentDB = newDb;
-}
-
 - (id)objectAtIndexedSubscript:(int)columnIdx {
     return [self objectForColumnIndex:columnIdx];
 }
 
 - (id)objectForKeyedSubscript:(NSString *)columnName {
-    return [self objectForColumnName:columnName];
+    return [self objectForColumn:columnName];
 }
 
 

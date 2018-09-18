@@ -1,5 +1,5 @@
 //
-//  FMDatabaseAdditions.m
+//  LCDatabaseAdditions.m
 //  fmdb
 //
 //  Created by August Mueller on 10/30/05.
@@ -10,8 +10,14 @@
 #import "LCDatabaseAdditions.h"
 #import "TargetConditionals.h"
 
+#if LCDB_SQLITE_STANDALONE
+#import <sqlite3/sqlite3.h>
+#else
+#import <sqlite3.h>
+#endif
+
 @interface LCDatabase (PrivateStuff)
-- (LCResultSet *)executeQuery:(NSString *)sql withArgumentsInArray:(NSArray*)arrayArgs orDictionary:(NSDictionary *)dictionaryArgs orVAList:(va_list)args;
+- (LCResultSet *)executeQuery:(NSString *)sql withArgumentsInArray:(NSArray * _Nullable)arrayArgs orDictionary:(NSDictionary * _Nullable)dictionaryArgs orVAList:(va_list)args;
 @end
 
 @implementation LCDatabase (LCDatabaseAdditions)
@@ -28,7 +34,7 @@ type ret = [resultSet sel:0];                                        \
 return ret;
 
 
-- (NSString*)stringForQuery:(NSString*)query, ... {
+- (NSString *)stringForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSString *, stringForColumnIndex);
 }
 
@@ -52,7 +58,7 @@ return ret;
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSData *, dataForColumnIndex);
 }
 
-- (NSDate *)dateForQuery:(NSString*)query, ... {
+- (NSDate*)dateForQuery:(NSString*)query, ... {
     RETURN_RESULT_FOR_QUERY_WITH_SELECTOR(NSDate *, dateForColumnIndex);
 }
 
@@ -112,17 +118,16 @@ return ret;
         }
     }
     
-    //If this is not done FMDatabase instance stays out of pool
+    //If this is not done LCDatabase instance stays out of pool
     [rs close];
     
     return returnBool;
 }
 
 
-#if SQLITE_VERSION_NUMBER >= 3007017
 
 - (uint32_t)applicationID {
-    
+#if SQLITE_VERSION_NUMBER >= 3007017
     uint32_t r = 0;
     
     LCResultSet *rs = [self executeQuery:@"pragma application_id"];
@@ -134,18 +139,30 @@ return ret;
     [rs close];
     
     return r;
+#else
+    NSString *errorMessage = NSLocalizedString(@"Application ID functions require SQLite 3.7.17", nil);
+    if (self.logsErrors) NSLog(@"%@", errorMessage);
+    return 0;
+#endif
 }
 
 - (void)setApplicationID:(uint32_t)appID {
+#if SQLITE_VERSION_NUMBER >= 3007017
     NSString *query = [NSString stringWithFormat:@"pragma application_id=%d", appID];
     LCResultSet *rs = [self executeQuery:query];
     [rs next];
     [rs close];
+#else
+    NSString *errorMessage = NSLocalizedString(@"Application ID functions require SQLite 3.7.17", nil);
+    if (self.logsErrors) NSLog(@"%@", errorMessage);
+#endif
 }
 
 
 #if TARGET_OS_MAC && !TARGET_OS_IPHONE
+
 - (NSString*)applicationIDString {
+#if SQLITE_VERSION_NUMBER >= 3007017
     NSString *s = NSFileTypeForHFSTypeCode([self applicationID]);
     
     assert([s length] == 6);
@@ -154,20 +171,25 @@ return ret;
     
     
     return s;
-    
+#else
+    NSString *errorMessage = NSLocalizedString(@"Application ID functions require SQLite 3.7.17", nil);
+    if (self.logsErrors) NSLog(@"%@", errorMessage);
+    return nil;
+#endif
 }
 
 - (void)setApplicationIDString:(NSString*)s {
-    
+#if SQLITE_VERSION_NUMBER >= 3007017
     if ([s length] != 4) {
         NSLog(@"setApplicationIDString: string passed is not exactly 4 chars long. (was %ld)", [s length]);
     }
     
     [self setApplicationID:NSHFSTypeCodeFromFileType([NSString stringWithFormat:@"'%@'", s])];
-}
-
-
+#else
+    NSString *errorMessage = NSLocalizedString(@"Application ID functions require SQLite 3.7.17", nil);
+    if (self.logsErrors) NSLog(@"%@", errorMessage);
 #endif
+}
 
 #endif
 
@@ -200,12 +222,11 @@ return ret;
 
 #pragma clang diagnostic pop
 
-
 - (BOOL)validateSQL:(NSString*)sql error:(NSError**)error {
     sqlite3_stmt *pStmt = NULL;
     BOOL validationSucceeded = YES;
     
-    int rc = sqlite3_prepare_v2(_db, [sql UTF8String], -1, &pStmt, 0);
+    int rc = sqlite3_prepare_v2([self sqliteHandle], [sql UTF8String], -1, &pStmt, 0);
     if (rc != SQLITE_OK) {
         validationSucceeded = NO;
         if (error) {

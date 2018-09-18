@@ -1,5 +1,5 @@
 //
-//  FMDatabasePool.h
+//  LCDatabasePool.h
 //  fmdb
 //
 //  Created by August Mueller on 6/22/11.
@@ -7,20 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "sqlite3.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class LCDatabase;
 
-/** Pool of `<FMDatabase>` objects.
+/** Pool of `<LCDatabase>` objects.
 
  ### See also
  
- - `<FMDatabaseQueue>`
- - `<FMDatabase>`
+ - `<LCDatabaseQueue>`
+ - `<LCDatabase>`
 
- @warning Before using `FMDatabasePool`, please consider using `<FMDatabaseQueue>` instead.
+ @warning Before using `LCDatabasePool`, please consider using `<LCDatabaseQueue>` instead.
 
- If you really really really know what you're doing and `FMDatabasePool` is what
+ If you really really really know what you're doing and `LCDatabasePool` is what
  you really really need (ie, you're using a read only database), OK you can use
  it.  But just be careful not to deadlock!
 
@@ -29,27 +30,15 @@
  in the main.m file.
  */
 
-@interface LCDatabasePool : NSObject {
-    NSString            *_path;
-    
-    dispatch_queue_t    _lockQueue;
-    
-    NSMutableArray      *_databaseInPool;
-    NSMutableArray      *_databaseOutPool;
-    
-    __unsafe_unretained id _delegate;
-    
-    NSUInteger          _maximumNumberOfDatabasesToCreate;
-    int                 _openFlags;
-}
+@interface LCDatabasePool : NSObject
 
 /** Database path */
 
-@property (atomic, retain) NSString *path;
+@property (atomic, copy, nullable) NSString *path;
 
 /** Delegate object */
 
-@property (atomic, assign) id delegate;
+@property (atomic, assign, nullable) id delegate;
 
 /** Maximum number of databases to create */
 
@@ -59,73 +48,140 @@
 
 @property (atomic, readonly) int openFlags;
 
+/**  Custom virtual file system name */
+
+@property (atomic, copy, nullable) NSString *vfsName;
+
 
 ///---------------------
 /// @name Initialization
 ///---------------------
 
 /** Create pool using path.
-
+ 
  @param aPath The file path of the database.
-
- @return The `FMDatabasePool` object. `nil` on error.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
  */
 
-+ (instancetype)databasePoolWithPath:(NSString*)aPath;
++ (instancetype)databasePoolWithPath:(NSString * _Nullable)aPath;
+
+/** Create pool using file URL.
+ 
+ @param url The file `NSURL` of the database.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
++ (instancetype)databasePoolWithURL:(NSURL * _Nullable)url;
 
 /** Create pool using path and specified flags
-
+ 
  @param aPath The file path of the database.
- @param openFlags Flags passed to the openWithFlags method of the database
-
- @return The `FMDatabasePool` object. `nil` on error.
+ @param openFlags Flags passed to the openWithFlags method of the database.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
  */
 
-+ (instancetype)databasePoolWithPath:(NSString*)aPath flags:(int)openFlags;
++ (instancetype)databasePoolWithPath:(NSString * _Nullable)aPath flags:(int)openFlags;
+
+/** Create pool using file URL and specified flags
+ 
+ @param url The file `NSURL` of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
++ (instancetype)databasePoolWithURL:(NSURL * _Nullable)url flags:(int)openFlags;
 
 /** Create pool using path.
-
+ 
  @param aPath The file path of the database.
-
- @return The `FMDatabasePool` object. `nil` on error.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
  */
 
-- (instancetype)initWithPath:(NSString*)aPath;
+- (instancetype)initWithPath:(NSString * _Nullable)aPath;
+
+/** Create pool using file URL.
+ 
+ @param url The file `NSURL of the database.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url;
 
 /** Create pool using path and specified flags.
-
+ 
  @param aPath The file path of the database.
  @param openFlags Flags passed to the openWithFlags method of the database
-
- @return The `FMDatabasePool` object. `nil` on error.
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
  */
 
-- (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags;
+- (instancetype)initWithPath:(NSString * _Nullable)aPath flags:(int)openFlags;
+
+/** Create pool using file URL and specified flags.
+ 
+ @param url The file `NSURL` of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url flags:(int)openFlags;
+
+/** Create pool using path and specified flags.
+ 
+ @param aPath The file path of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database
+ @param vfsName The name of a custom virtual file system
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
+- (instancetype)initWithPath:(NSString * _Nullable)aPath flags:(int)openFlags vfs:(NSString * _Nullable)vfsName;
+
+/** Create pool using file URL and specified flags.
+ 
+ @param url The file `NSURL` of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database
+ @param vfsName The name of a custom virtual file system
+ 
+ @return The `LCDatabasePool` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url flags:(int)openFlags vfs:(NSString * _Nullable)vfsName;
+
+/** Returns the Class of 'LCDatabase' subclass, that will be used to instantiate database object.
+
+ Subclasses can override this method to return specified Class of 'LCDatabase' subclass.
+
+ @return The Class of 'LCDatabase' subclass, that will be used to instantiate database object.
+ */
+
++ (Class)databaseClass;
 
 ///------------------------------------------------
 /// @name Keeping track of checked in/out databases
 ///------------------------------------------------
 
 /** Number of checked-in databases in pool
- 
- @returns Number of databases
  */
 
-- (NSUInteger)countOfCheckedInDatabases;
+@property (nonatomic, readonly) NSUInteger countOfCheckedInDatabases;
 
 /** Number of checked-out databases in pool
-
- @returns Number of databases
  */
 
-- (NSUInteger)countOfCheckedOutDatabases;
+@property (nonatomic, readonly) NSUInteger countOfCheckedOutDatabases;
 
 /** Total number of databases in pool
-
- @returns Number of databases
  */
 
-- (NSUInteger)countOfOpenDatabases;
+@property (nonatomic, readonly) NSUInteger countOfOpenDatabases;
 
 /** Release all databases in pool */
 
@@ -137,53 +193,50 @@
 
 /** Synchronously perform database operations in pool.
 
- @param block The code to be run on the `FMDatabasePool` pool.
+ @param block The code to be run on the `LCDatabasePool` pool.
  */
 
-- (void)inDatabase:(void (^)(LCDatabase *db))block;
+- (void)inDatabase:(void (NS_NOESCAPE ^)(LCDatabase *db))block;
 
 /** Synchronously perform database operations in pool using transaction.
 
- @param block The code to be run on the `FMDatabasePool` pool.
+ @param block The code to be run on the `LCDatabasePool` pool.
  */
 
-- (void)inTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block;
+- (void)inTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 /** Synchronously perform database operations in pool using deferred transaction.
 
- @param block The code to be run on the `FMDatabasePool` pool.
+ @param block The code to be run on the `LCDatabasePool` pool.
  */
 
-- (void)inDeferredTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block;
-
-#if SQLITE_VERSION_NUMBER >= 3007000
+- (void)inDeferredTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 /** Synchronously perform database operations in pool using save point.
 
- @param block The code to be run on the `FMDatabasePool` pool.
+ @param block The code to be run on the `LCDatabasePool` pool.
  
  @return `NSError` object if error; `nil` if successful.
 
- @warning You can not nest these, since calling it will pull another database out of the pool and you'll get a deadlock. If you need to nest, use `<[FMDatabase startSavePointWithName:error:]>` instead.
+ @warning You can not nest these, since calling it will pull another database out of the pool and you'll get a deadlock. If you need to nest, use `<[LCDatabase startSavePointWithName:error:]>` instead.
 */
 
-- (NSError*)inSavePoint:(void (^)(LCDatabase *db, BOOL *rollback))block;
-#endif
+- (NSError * _Nullable)inSavePoint:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 @end
 
 
-/** FMDatabasePool delegate category
+/** LCDatabasePool delegate category
  
- This is a category that defines the protocol for the FMDatabasePool delegate
+ This is a category that defines the protocol for the LCDatabasePool delegate
  */
 
-@interface NSObject (FMDatabasePoolDelegate)
+@interface NSObject (LCDatabasePoolDelegate)
 
 /** Asks the delegate whether database should be added to the pool. 
  
- @param pool     The `FMDatabasePool` object.
- @param database The `FMDatabase` object.
+ @param pool     The `LCDatabasePool` object.
+ @param database The `LCDatabase` object.
  
  @return `YES` if it should add database to pool; `NO` if not.
  
@@ -193,8 +246,8 @@
 
 /** Tells the delegate that database was added to the pool.
  
- @param pool     The `FMDatabasePool` object.
- @param database The `FMDatabase` object.
+ @param pool     The `LCDatabasePool` object.
+ @param database The `LCDatabase` object.
 
  */
 
@@ -202,3 +255,4 @@
 
 @end
 
+NS_ASSUME_NONNULL_END

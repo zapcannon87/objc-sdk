@@ -1,5 +1,5 @@
 //
-//  FMDatabaseQueue.h
+//  LCDatabaseQueue.h
 //  fmdb
 //
 //  Created by August Mueller on 6/22/11.
@@ -7,28 +7,29 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "sqlite3.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 @class LCDatabase;
 
-/** To perform queries and updates on multiple threads, you'll want to use `FMDatabaseQueue`.
+/** To perform queries and updates on multiple threads, you'll want to use `LCDatabaseQueue`.
 
- Using a single instance of `<FMDatabase>` from multiple threads at once is a bad idea.  It has always been OK to make a `<FMDatabase>` object *per thread*.  Just don't share a single instance across threads, and definitely not across multiple threads at the same time.
+ Using a single instance of `<LCDatabase>` from multiple threads at once is a bad idea.  It has always been OK to make a `<LCDatabase>` object *per thread*.  Just don't share a single instance across threads, and definitely not across multiple threads at the same time.
 
- Instead, use `FMDatabaseQueue`. Here's how to use it:
+ Instead, use `LCDatabaseQueue`. Here's how to use it:
 
  First, make your queue.
 
-    FMDatabaseQueue *queue = [FMDatabaseQueue databaseQueueWithPath:aPath];
+    LCDatabaseQueue *queue = [LCDatabaseQueue databaseQueueWithPath:aPath];
 
  Then use it like so:
 
-    [queue inDatabase:^(FMDatabase *db) {
+    [queue inDatabase:^(LCDatabase *db) {
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:1]];
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:2]];
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:3]];
 
-        FMResultSet *rs = [db executeQuery:@"select * from foo"];
+        LCResultSet *rs = [db executeQuery:@"select * from foo"];
         while ([rs next]) {
             //…
         }
@@ -36,7 +37,7 @@
 
  An easy way to wrap things up in a transaction can be done like this:
 
-    [queue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+    [queue inTransaction:^(LCDatabase *db, BOOL *rollback) {
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:1]];
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:2]];
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:3]];
@@ -49,32 +50,30 @@
         [db executeUpdate:@"INSERT INTO myTable VALUES (?)", [NSNumber numberWithInt:4]];
     }];
 
- `FMDatabaseQueue` will run the blocks on a serialized queue (hence the name of the class).  So if you call `FMDatabaseQueue`'s methods from multiple threads at the same time, they will be executed in the order they are received.  This way queries and updates won't step on each other's toes, and every one is happy.
+ `LCDatabaseQueue` will run the blocks on a serialized queue (hence the name of the class).  So if you call `LCDatabaseQueue`'s methods from multiple threads at the same time, they will be executed in the order they are received.  This way queries and updates won't step on each other's toes, and every one is happy.
 
  ### See also
 
- - `<FMDatabase>`
+ - `<LCDatabase>`
 
- @warning Do not instantiate a single `<FMDatabase>` object and use it across multiple threads. Use `FMDatabaseQueue` instead.
+ @warning Do not instantiate a single `<LCDatabase>` object and use it across multiple threads. Use `LCDatabaseQueue` instead.
  
- @warning The calls to `FMDatabaseQueue`'s methods are blocking.  So even though you are passing along blocks, they will **not** be run on another thread.
+ @warning The calls to `LCDatabaseQueue`'s methods are blocking.  So even though you are passing along blocks, they will **not** be run on another thread.
 
  */
 
-@interface LCDatabaseQueue : NSObject {
-    NSString            *_path;
-    dispatch_queue_t    _queue;
-    LCDatabase          *_db;
-    int                 _openFlags;
-}
-
+@interface LCDatabaseQueue : NSObject
 /** Path of database */
 
-@property (atomic, retain) NSString *path;
+@property (atomic, retain, nullable) NSString *path;
 
 /** Open flags */
 
 @property (atomic, readonly) int openFlags;
+
+/**  Custom virtual file system name */
+
+@property (atomic, copy, nullable) NSString *vfsName;
 
 ///----------------------------------------------------
 /// @name Initialization, opening, and closing of queue
@@ -84,44 +83,103 @@
  
  @param aPath The file path of the database.
  
- @return The `FMDatabaseQueue` object. `nil` on error.
+ @return The `LCDatabaseQueue` object. `nil` on error.
  */
 
-+ (instancetype)databaseQueueWithPath:(NSString*)aPath;
++ (instancetype)databaseQueueWithPath:(NSString * _Nullable)aPath;
+
+/** Create queue using file URL.
+ 
+ @param url The file `NSURL` of the database.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
+
++ (instancetype)databaseQueueWithURL:(NSURL * _Nullable)url;
 
 /** Create queue using path and specified flags.
  
  @param aPath The file path of the database.
- @param openFlags Flags passed to the openWithFlags method of the database
+ @param openFlags Flags passed to the openWithFlags method of the database.
  
- @return The `FMDatabaseQueue` object. `nil` on error.
+ @return The `LCDatabaseQueue` object. `nil` on error.
  */
-+ (instancetype)databaseQueueWithPath:(NSString*)aPath flags:(int)openFlags;
++ (instancetype)databaseQueueWithPath:(NSString * _Nullable)aPath flags:(int)openFlags;
+
+/** Create queue using file URL and specified flags.
+ 
+ @param url The file `NSURL` of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
++ (instancetype)databaseQueueWithURL:(NSURL * _Nullable)url flags:(int)openFlags;
 
 /** Create queue using path.
-
+ 
  @param aPath The file path of the database.
-
- @return The `FMDatabaseQueue` object. `nil` on error.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
  */
 
-- (instancetype)initWithPath:(NSString*)aPath;
+- (instancetype)initWithPath:(NSString * _Nullable)aPath;
+
+/** Create queue using file URL.
+ 
+ @param url The file `NSURL of the database.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url;
+
+/** Create queue using path and specified flags.
+ 
+ @param aPath The file path of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
+
+- (instancetype)initWithPath:(NSString * _Nullable)aPath flags:(int)openFlags;
+
+/** Create queue using file URL and specified flags.
+ 
+ @param url The file path of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database.
+ 
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url flags:(int)openFlags;
 
 /** Create queue using path and specified flags.
  
  @param aPath The file path of the database.
  @param openFlags Flags passed to the openWithFlags method of the database
+ @param vfsName The name of a custom virtual file system
  
- @return The `FMDatabaseQueue` object. `nil` on error.
+ @return The `LCDatabaseQueue` object. `nil` on error.
  */
 
-- (instancetype)initWithPath:(NSString*)aPath flags:(int)openFlags;
+- (instancetype)initWithPath:(NSString * _Nullable)aPath flags:(int)openFlags vfs:(NSString * _Nullable)vfsName;
 
-/** Returns the Class of 'FMDatabase' subclass, that will be used to instantiate database object.
+/** Create queue using file URL and specified flags.
  
- Subclasses can override this method to return specified Class of 'FMDatabase' subclass.
+ @param url The file `NSURL of the database.
+ @param openFlags Flags passed to the openWithFlags method of the database
+ @param vfsName The name of a custom virtual file system
  
- @return The Class of 'FMDatabase' subclass, that will be used to instantiate database object.
+ @return The `LCDatabaseQueue` object. `nil` on error.
+ */
+
+- (instancetype)initWithURL:(NSURL * _Nullable)url flags:(int)openFlags vfs:(NSString * _Nullable)vfsName;
+
+/** Returns the Class of 'LCDatabase' subclass, that will be used to instantiate database object.
+ 
+ Subclasses can override this method to return specified Class of 'LCDatabase' subclass.
+ 
+ @return The Class of 'LCDatabase' subclass, that will be used to instantiate database object.
  */
 
 + (Class)databaseClass;
@@ -130,30 +188,34 @@
 
 - (void)close;
 
+/** Interupt pending database operation. */
+
+- (void)interrupt;
+
 ///-----------------------------------------------
 /// @name Dispatching database operations to queue
 ///-----------------------------------------------
 
 /** Synchronously perform database operations on queue.
  
- @param block The code to be run on the queue of `FMDatabaseQueue`
+ @param block The code to be run on the queue of `LCDatabaseQueue`
  */
 
-- (void)inDatabase:(void (^)(LCDatabase *db))block;
+- (void)inDatabase:(void (NS_NOESCAPE ^)(LCDatabase *db))block;
 
 /** Synchronously perform database operations on queue, using transactions.
 
- @param block The code to be run on the queue of `FMDatabaseQueue`
+ @param block The code to be run on the queue of `LCDatabaseQueue`
  */
 
-- (void)inTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block;
+- (void)inTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 /** Synchronously perform database operations on queue, using deferred transactions.
 
- @param block The code to be run on the queue of `FMDatabaseQueue`
+ @param block The code to be run on the queue of `LCDatabaseQueue`
  */
 
-- (void)inDeferredTransaction:(void (^)(LCDatabase *db, BOOL *rollback))block;
+- (void)inDeferredTransaction:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 ///-----------------------------------------------
 /// @name Dispatching database operations to queue
@@ -161,14 +223,13 @@
 
 /** Synchronously perform database operations using save point.
 
- @param block The code to be run on the queue of `FMDatabaseQueue`
+ @param block The code to be run on the queue of `LCDatabaseQueue`
  */
 
-#if SQLITE_VERSION_NUMBER >= 3007000
 // NOTE: you can not nest these, since calling it will pull another database out of the pool and you'll get a deadlock.
 // If you need to nest, use FMDatabase's startSavePointWithName:error: instead.
-- (NSError*)inSavePoint:(void (^)(LCDatabase *db, BOOL *rollback))block;
-#endif
+- (NSError * _Nullable)inSavePoint:(void (NS_NOESCAPE ^)(LCDatabase *db, BOOL *rollback))block;
 
 @end
 
+NS_ASSUME_NONNULL_END
