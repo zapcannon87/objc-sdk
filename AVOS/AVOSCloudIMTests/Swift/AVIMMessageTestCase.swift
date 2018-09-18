@@ -1487,7 +1487,7 @@ class AVIMMessageTestCase: LCIMTestBase {
                     XCTAssertTrue(commonMessage.sendTimestamp > 0)
                     XCTAssertNotNil(commonMessage.clientId)
                     if succeeded {
-                        XCTAssertTrue(RunLoop.current.run(mode: .defaultRunLoopMode, before: Date(timeIntervalSinceNow: 1.0)))
+                        XCTAssertTrue(RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 1.0)))
                         normalConv.update(commonMessage, toNewMessage: newCommonMessage, callback: { (succeeded: Bool, error: Error?) in
                             semaphore.decrement()
                             XCTAssertTrue(Thread.isMainThread)
@@ -1573,7 +1573,7 @@ class AVIMMessageTestCase: LCIMTestBase {
                     XCTAssertTrue(commonMessage.sendTimestamp > 0)
                     XCTAssertNotNil(commonMessage.clientId)
                     if succeeded {
-                        XCTAssertTrue(RunLoop.current.run(mode: .defaultRunLoopMode, before: Date(timeIntervalSinceNow: 1.0)))
+                        XCTAssertTrue(RunLoop.current.run(mode: .default, before: Date(timeIntervalSinceNow: 1.0)))
                         normalConv.recall(commonMessage, callback: { (succeeded: Bool, error: Error?, recalledMessage: AVIMRecalledMessage?) in
                             semaphore.decrement()
                             XCTAssertTrue(Thread.isMainThread)

@@ -1501,7 +1501,8 @@ NSArray *LCPublicKeysFromCerts(NSArray *certs) {
         
         do {
             if (SecTrustCreateWithCertificates(certificates, policy, &trust) != noErr) break;
-            if (SecTrustEvaluate(trust, NULL) != noErr) break;
+            SecTrustResultType trustResult;
+            if (SecTrustEvaluate(trust, &trustResult) != noErr) break;
             
             id publicKey = (__bridge_transfer id)SecTrustCopyPublicKey(trust);
             

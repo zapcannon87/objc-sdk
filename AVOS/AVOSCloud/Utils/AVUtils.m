@@ -179,7 +179,8 @@ SecKeyRef LCGetPublicKeyFromCertificate(SecCertificateRef cert) {
 
     SecTrustRef trust;
     __Require_noErr_Quiet(SecTrustCreateWithCertificates(certArr, policy, &trust), _out);
-    __Require_noErr_Quiet(SecTrustEvaluate(trust, NULL), _out);
+    SecTrustResultType trustResult;
+    __Require_noErr_Quiet(SecTrustEvaluate(trust, &trustResult), _out);
 
     result = SecTrustCopyPublicKey(trust);
 

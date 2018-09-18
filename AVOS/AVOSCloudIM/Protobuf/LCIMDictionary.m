@@ -13613,14 +13613,14 @@ void LCIMDictionaryReadEntry(id mapDictionary,
   }
 }
 
-- (void)enumerateKeysAndObjectsUsingBlock:(void (^)(id key,
+- (void)enumerateKeysAndObjectsUsingBlock:(void (NS_NOESCAPE ^)(id key,
                                                     id obj,
                                                     BOOL *stop))block {
   [_dictionary enumerateKeysAndObjectsUsingBlock:block];
 }
 
 - (void)enumerateKeysAndObjectsWithOptions:(NSEnumerationOptions)opts
-                                usingBlock:(void (^)(id key,
+                                usingBlock:(void (NS_NOESCAPE ^)(id key,
                                                      id obj,
                                                      BOOL *stop))block {
   [_dictionary enumerateKeysAndObjectsWithOptions:opts usingBlock:block];
