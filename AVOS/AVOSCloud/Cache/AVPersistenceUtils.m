@@ -6,19 +6,61 @@
 //  Copyright (c) 2013年 AVOS. All rights reserved.
 //
 
-#import "AVPersistenceUtils.h"
 #import <TargetConditionals.h>
+#import "AVPersistenceUtils.h"
 #import "AVUtils.h"
 
 #define LCRootDirName @"LeanCloud"
 #define LCMessageCacheDirName @"MessageCache"
+
+typedef NSString * const LeanCloudReverseDomain NS_TYPED_EXTENSIBLE_ENUM;
+static LeanCloudReverseDomain LeanCloudReverseDomainData = @"com.leancloud.data";
+static LeanCloudReverseDomain LeanCloudReverseDomainCaches = @"com.leancloud.caches";
+
+static NSString * LibraryCaches()
+{
+    return NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstObject;
+}
+
+static NSString * LeanCloudCaches()
+{
+    return [LibraryCaches() stringByAppendingPathComponent:LeanCloudReverseDomainCaches];
+}
+
+static NSString * AppCaches(NSString *appID)
+{
+    if (appID.length) {
+        return [LeanCloudCaches() stringByAppendingPathComponent:appID];
+    } else {
+        return nil;
+    }
+}
+
+static NSString * LibraryApplicationSupport()
+{
+    return NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, true).firstObject;
+}
+
+static NSString * LeanCloudData()
+{
+    return [LibraryApplicationSupport() stringByAppendingPathComponent:LeanCloudReverseDomainData];
+}
+
+static NSString * AppData(NSString *appID)
+{
+    if (appID.length) {
+        return [LeanCloudData() stringByAppendingPathComponent:appID];
+    } else {
+        return nil;
+    }
+}
 
 @implementation AVPersistenceUtils
 
 // MARK: - Home Directory: ~/
 + (NSString *)homeDirectory
 {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     return NSHomeDirectory();
 #elif TARGET_OS_OSX
     /// ~/Library/Application Support/LeanCloud/appId
@@ -34,34 +76,28 @@
 #endif
 }
 
-// MARK: - ~/Library
-+ (NSString *)homeDirectoryLibrary
-{
-    return [[self homeDirectory] stringByAppendingPathComponent:@"Library"];
-}
-
-// MARK: - ~/Library/Caches
-+ (NSString *)homeDirectoryLibraryCaches
-{
-    return [[self homeDirectoryLibrary] stringByAppendingPathComponent:@"Caches"];
-}
-
-// MARK: - ~/Library/Caches/com.leancloud.caches
-+ (NSString *)homeDirectoryLibraryCachesLeanCloudCaches
-{
-    return [[self homeDirectoryLibraryCaches] stringByAppendingPathComponent:@"com.leancloud.caches"];
-}
-
 // MARK: - ~/Library/Caches/com.leancloud.caches/Files
 + (NSString *)homeDirectoryLibraryCachesLeanCloudCachesFiles
 {
-    return [[self homeDirectoryLibraryCachesLeanCloudCaches] stringByAppendingPathComponent:@"Files"];
+    return [LeanCloudCaches() stringByAppendingPathComponent:@"Files"];
 }
 
 // MARK: - ~/Library/Caches/com.leancloud.caches/Router
 + (NSString *)homeDirectoryLibraryCachesLeanCloudCachesRouter
 {
-    return [[self homeDirectoryLibraryCachesLeanCloudCaches] stringByAppendingPathComponent:@"Router"];
+    return [LeanCloudCaches() stringByAppendingPathComponent:@"Router"];
+}
+
+// MARK: - ~/Library/Caches/com.leancloud.caches/{App ID}/_Router
++ (NSString *)directoryPathOfRouterWithAppID:(NSString *)appID
+{
+    return [AppCaches(appID) stringByAppendingPathComponent:@"_Router"];
+}
+
+// MARK: - ~/Library/Application Support/com.leancloud.data/{App ID}/_Conversation
++ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID
+{
+    return [AppData(appID) stringByAppendingPathComponent:@"_Conversation"];
 }
 
 #pragma mark - ~/Documents
@@ -102,14 +138,14 @@
 
 // ~/Library/Caches/AVPaasCache, for AVCacheManager
 + (NSString *)avCacheDirectory {
-    NSString *ret = [[AVPersistenceUtils homeDirectoryLibraryCaches] stringByAppendingPathComponent:@"AVPaasCache"];
+    NSString *ret = [LibraryCaches() stringByAppendingPathComponent:@"AVPaasCache"];
     [self createDirectoryIfNeeded:ret];
     return ret;
 }
 
 // ~/Library/Caches/LeanCloud/MessageCache
 + (NSString *)messageCachePath {
-    NSString *path = [self homeDirectoryLibraryCaches];
+    NSString *path = LibraryCaches();
     
     path = [path stringByAppendingPathComponent:LCRootDirName];
     path = [path stringByAppendingPathComponent:LCMessageCacheDirName];

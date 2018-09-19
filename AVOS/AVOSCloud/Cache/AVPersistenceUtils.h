@@ -10,6 +10,8 @@
 
 @interface AVPersistenceUtils : NSObject
 
++ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID;
+
 + (NSString *)homeDirectoryLibraryCachesLeanCloudCachesFiles;
 + (NSString *)homeDirectoryLibraryCachesLeanCloudCachesRouter;
 
