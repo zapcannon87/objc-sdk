@@ -40,6 +40,8 @@
  */
 - (NSString *)AVMD5String;
 
+- (NSString *)lc__MD5StringLowercase;
+
 @end
 
 
