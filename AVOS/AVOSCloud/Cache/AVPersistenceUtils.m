@@ -49,7 +49,8 @@ static NSString * LeanCloudData()
 static NSString * AppData(NSString *appID)
 {
     if (appID.length) {
-        return [LeanCloudData() stringByAppendingPathComponent:appID];
+        NSString *md5ForAppID = [appID lc__MD5StringLowercase];
+        return [LeanCloudData() stringByAppendingPathComponent:md5ForAppID];
     } else {
         return nil;
     }
