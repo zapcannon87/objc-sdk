@@ -118,8 +118,8 @@ class LCRouterTestCase: LCTestBase {
         }
         
         let appID: String = AVOSCloud.getApplicationId()
-        let appRouterCachePath: String = LCRouter.routerCacheDirectoryPath() + "/" + RouterCacheKey.app.rawValue
-        let RTMRouterCachePath: String = LCRouter.routerCacheDirectoryPath() + "/" + RouterCacheKey.RTM.rawValue
+        let appRouterCachePath: String = LCRouter.sharedInstance().directoryPathOfCache + "/" + RouterCacheKey.app.rawValue
+        let RTMRouterCachePath: String = LCRouter.sharedInstance().directoryPathOfCache + "/" + RouterCacheKey.RTM.rawValue
         LCRouter.sharedInstance().cleanCache(withKey: .app, error: nil)
         LCRouter.sharedInstance().cleanCache(withKey: .RTM, error: nil)
         XCTAssertFalse(FileManager.default.fileExists(atPath: appRouterCachePath))
