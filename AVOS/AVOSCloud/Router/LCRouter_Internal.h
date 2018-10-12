@@ -41,7 +41,7 @@ static RouterKey RouterKeyRTMServer = @"server";
 
 @interface LCRouter ()
 
-@property (atomic, assign) BOOL isUpdatingAppRouter;
+@property (nonatomic, strong, readonly) NSString *directoryPathOfCache;
 
 /// internal
 
@@ -62,8 +62,6 @@ static RouterKey RouterKeyRTMServer = @"server";
 - (NSString *)RTMRouterURLForAppID:(NSString *)appID;
 
 - (void)tryUpdateAppRouterWithAppID:(NSString *)appID callback:(void (^)(NSError *error))callback;
-
-+ (NSString *)routerCacheDirectoryPath;
 
 - (void)getAndCacheRTMRouterDataWithAppID:(NSString *)appID RTMRouterURL:(NSString *)RTMRouterURL callback:(void (^)(NSDictionary *dataDictionary, NSError *error))callback;
 

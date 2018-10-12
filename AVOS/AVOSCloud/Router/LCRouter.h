@@ -16,43 +16,26 @@ FOUNDATION_EXPORT RouterCacheKey RouterCacheKeyRTM;
 
 @interface LCRouter : NSObject
 
+/**
+ LCRouter is singleton in environment.
+ */
 + (instancetype)sharedInstance;
 
-/**
- Custom API version.
-
- @param APIVersion Format eg. '1.1'.
- */
-+ (void)setAPIVersion:(NSString *)APIVersion;
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
- Custom RTM router API path.
+ Clean local cache of router.
 
- @param RTMRouterPath Format eg. '/v1/route'.
- */
-+ (void)setRTMRouterPath:(NSString *)RTMRouterPath;
-
-/**
- Custom router cache directory path.
-
- @param directoryPath Path.
- */
-+ (void)setRouterCacheDirectoryPath:(NSString *)directoryPath;
-
-/**
- Clean disk cache.
-
- @param key Cache type.
- @param error Error.
+ @param key Module key.
+ @param error Can be nil.
  */
 - (void)cleanCacheWithKey:(RouterCacheKey)key error:(NSError * __autoreleasing *)error;
 
-// MARK: - Deprecated
-
-/// for compatibility
-- (NSString *)URLStringForPath:(NSString *)path __deprecated;
+/**
+ Keep it for compatibility.
+ */
+- (NSString *)URLStringForPath:(NSString *)path __deprecated_msg("Deprecated! don't use it any more.");
 
 @end
 
 NS_ASSUME_NONNULL_END
-
