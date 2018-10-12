@@ -6,14 +6,19 @@
 //  Copyright (c) 2013年 AVOS. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>   
+#import <Foundation/Foundation.h>
 
 @interface AVPersistenceUtils : NSObject
 
-+ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID;
+// MARK: - ~/Library/Caches/com.leancloud.caches/_Router
++ (NSString *)directoryPathOfRouterWithAutoCreate:(BOOL)autoCreate;
+
+// MARK: - ~/Library/Application Support/com.leancloud.data/{App ID MD5 String}/_Conversation
++ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID autoCreate:(BOOL)autoCreate;
+
+// MARK: - 
 
 + (NSString *)homeDirectoryLibraryCachesLeanCloudCachesFiles;
-+ (NSString *)homeDirectoryLibraryCachesLeanCloudCachesRouter;
 
 + (NSString *)avCacheDirectory;
 

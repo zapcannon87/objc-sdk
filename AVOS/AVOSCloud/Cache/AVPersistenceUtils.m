@@ -27,14 +27,15 @@ static NSString * LeanCloudCaches()
     return [LibraryCaches() stringByAppendingPathComponent:LeanCloudReverseDomainCaches];
 }
 
-static NSString * AppCaches(NSString *appID)
-{
-    if (appID.length) {
-        return [LeanCloudCaches() stringByAppendingPathComponent:appID];
-    } else {
-        return nil;
-    }
-}
+//static NSString * AppCaches(NSString *appID)
+//{
+//    if (appID.length) {
+//        NSString *md5ForAppID = [appID lc__MD5StringLowercase];
+//        return [LeanCloudCaches() stringByAppendingPathComponent:md5ForAppID];
+//    } else {
+//        return nil;
+//    }
+//}
 
 static NSString * LibraryApplicationSupport()
 {
@@ -58,6 +59,55 @@ static NSString * AppData(NSString *appID)
 
 @implementation AVPersistenceUtils
 
++ (BOOL)createDirectoryAtPath:(NSString *)path
+{
+    NSParameterAssert(path.length);
+    NSError *error = nil;
+    if ([[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:true attributes:nil error:&error]) {
+        return true;
+    } else {
+        AVLoggerError(AVLoggerDomainDefault, @"%@", error);
+        return false;
+    }
+}
+
+// MARK: - ~/Library/Caches/com.leancloud.caches/_Router
++ (NSString *)directoryPathOfRouterWithAutoCreate:(BOOL)autoCreate
+{
+    NSString *path = [LeanCloudCaches() stringByAppendingPathComponent:@"_Router"];
+    if (path.length && autoCreate) {
+        if ([self createDirectoryAtPath:path]) {
+            return path;
+        } else {
+            return nil;
+        }
+    } else {
+        return path;
+    }
+}
+
+// MARK: - ~/Library/Application Support/com.leancloud.data/{App ID MD5 String}/_Conversation
++ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID autoCreate:(BOOL)autoCreate
+{
+    NSParameterAssert(appID.length);
+    NSString *path = [AppData(appID) stringByAppendingPathComponent:@"_Conversation"];
+    if (path.length && autoCreate) {
+        if ([self createDirectoryAtPath:path]) {
+            return path;
+        } else {
+            return nil;
+        }
+    } else {
+        return path;
+    }
+}
+
+// MARK: - ~/Library/Caches/com.leancloud.caches/Files
++ (NSString *)homeDirectoryLibraryCachesLeanCloudCachesFiles
+{
+    return [LeanCloudCaches() stringByAppendingPathComponent:@"Files"];
+}
+
 // MARK: - Home Directory: ~/
 + (NSString *)homeDirectory
 {
@@ -75,30 +125,6 @@ static NSString * AppData(NSString *appID)
 #else
     return nil;
 #endif
-}
-
-// MARK: - ~/Library/Caches/com.leancloud.caches/Files
-+ (NSString *)homeDirectoryLibraryCachesLeanCloudCachesFiles
-{
-    return [LeanCloudCaches() stringByAppendingPathComponent:@"Files"];
-}
-
-// MARK: - ~/Library/Caches/com.leancloud.caches/Router
-+ (NSString *)homeDirectoryLibraryCachesLeanCloudCachesRouter
-{
-    return [LeanCloudCaches() stringByAppendingPathComponent:@"Router"];
-}
-
-// MARK: - ~/Library/Caches/com.leancloud.caches/{App ID}/_Router
-+ (NSString *)directoryPathOfRouterWithAppID:(NSString *)appID
-{
-    return [AppCaches(appID) stringByAppendingPathComponent:@"_Router"];
-}
-
-// MARK: - ~/Library/Application Support/com.leancloud.data/{App ID}/_Conversation
-+ (NSString *)directoryPathOfConversationWithAppID:(NSString *)appID
-{
-    return [AppData(appID) stringByAppendingPathComponent:@"_Conversation"];
 }
 
 #pragma mark - ~/Documents
