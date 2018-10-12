@@ -1034,6 +1034,14 @@
 		D37A046A1FF3705500AD44A9 /* testFile.md in Resources */ = {isa = PBXBuildFile; fileRef = D37A04691FF3705500AD44A9 /* testFile.md */; };
 		D3939CC720FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */; };
 		D3939CC820FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */; };
+		D3B44E0E2170756F00E62B51 /* AVApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = D3B44E0C2170756E00E62B51 /* AVApplication.h */; };
+		D3B44E0F2170756F00E62B51 /* AVApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = D3B44E0C2170756E00E62B51 /* AVApplication.h */; };
+		D3B44E102170756F00E62B51 /* AVApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = D3B44E0C2170756E00E62B51 /* AVApplication.h */; };
+		D3B44E112170756F00E62B51 /* AVApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = D3B44E0C2170756E00E62B51 /* AVApplication.h */; };
+		D3B44E122170756F00E62B51 /* AVApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = D3B44E0D2170756F00E62B51 /* AVApplication.m */; };
+		D3B44E132170756F00E62B51 /* AVApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = D3B44E0D2170756F00E62B51 /* AVApplication.m */; };
+		D3B44E142170756F00E62B51 /* AVApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = D3B44E0D2170756F00E62B51 /* AVApplication.m */; };
+		D3B44E152170756F00E62B51 /* AVApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = D3B44E0D2170756F00E62B51 /* AVApplication.m */; };
 		D3C53FCC2106D84A00D48686 /* AVIMClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D3C53FCB2106D84A00D48686 /* AVIMClientProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D3C53FCD2106D84A00D48686 /* AVIMClientProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D3C53FCB2106D84A00D48686 /* AVIMClientProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D3CC90CB2069E5BB0082EFD4 /* AVObjectTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CC90CA2069E5BB0082EFD4 /* AVObjectTestCase.swift */; };
@@ -1479,6 +1487,8 @@
 		D37A04661FF36E6200AD44A9 /* testVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = testVideo.mp4; sourceTree = "<group>"; };
 		D37A04691FF3705500AD44A9 /* testFile.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = testFile.md; sourceTree = "<group>"; };
 		D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVIMClientInternalConversationManager_Internal.h; sourceTree = "<group>"; };
+		D3B44E0C2170756E00E62B51 /* AVApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVApplication.h; sourceTree = "<group>"; };
+		D3B44E0D2170756F00E62B51 /* AVApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVApplication.m; sourceTree = "<group>"; };
 		D3C53FCB2106D84A00D48686 /* AVIMClientProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVIMClientProtocol.h; sourceTree = "<group>"; };
 		D3CC90CA2069E5BB0082EFD4 /* AVObjectTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVObjectTestCase.swift; sourceTree = "<group>"; };
 		D3CDF4EA1FE8F3810033153E /* LCIMTestBase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LCIMTestBase.swift; sourceTree = "<group>"; };
@@ -1845,6 +1855,7 @@
 				8C8419F61A5A79FF00C5C6C4 /* AVOSCloud_Internal.h */,
 				8C84198B1A5A791300C5C6C4 /* AVOSCloud.h */,
 				8C8419F81A5A79FF00C5C6C4 /* AVOSCloud.m */,
+				D3B44E0B2170753200E62B51 /* Application */,
 				8C8419DC1A5A79FF00C5C6C4 /* ACL */,
 				8C8419E31A5A79FF00C5C6C4 /* Analytics */,
 				8C8419F91A5A79FF00C5C6C4 /* Cache */,
@@ -2436,6 +2447,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		D3B44E0B2170753200E62B51 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				D3B44E0C2170756E00E62B51 /* AVApplication.h */,
+				D3B44E0D2170756F00E62B51 /* AVApplication.m */,
+			);
+			path = Application;
+			sourceTree = "<group>";
+		};
 		D3D840C52100705500396B13 /* Signature */ = {
 			isa = PBXGroup;
 			children = (
@@ -2665,6 +2685,7 @@
 				70CA7FE81BDE42F6000A3B21 /* AVGlobal.h in Headers */,
 				9A404DD41CE5A9B700DEB3DC /* LCRouter.h in Headers */,
 				70CA7FE91BDE42F6000A3B21 /* AVOSCloud_Internal.h in Headers */,
+				D3B44E0F2170756F00E62B51 /* AVApplication.h in Headers */,
 				70CA7FEB1BDE42F6000A3B21 /* AVCacheManager.h in Headers */,
 				70CA7FEC1BDE42F6000A3B21 /* AVPersistenceUtils.h in Headers */,
 				70CA7FED1BDE42F6000A3B21 /* AVScheduler.h in Headers */,
@@ -2734,6 +2755,7 @@
 				83FCB9BC1CEDC57C007D8712 /* LCSecurityPolicy.h in Headers */,
 				8320F90F1C1918C60024B45E /* AVHelpers.h in Headers */,
 				8320F9111C1918C60024B45E /* LCDatabaseCommon.h in Headers */,
+				D3B44E112170756F00E62B51 /* AVApplication.h in Headers */,
 				8320F9121C1918C60024B45E /* LCResultSet.h in Headers */,
 				8320F9131C1918C60024B45E /* AVFile_Internal.h in Headers */,
 				83A2BD331CF33CDA0047B230 /* AVPaasClient_internal.h in Headers */,
@@ -2890,6 +2912,7 @@
 				83FCB9B11CEDC57C007D8712 /* LCNetworkReachabilityManager.h in Headers */,
 				83D8CF3F1C17DAF50094279D /* AVReachability.h in Headers */,
 				83D8CF401C17DAF50094279D /* AVDuration.h in Headers */,
+				D3B44E102170756F00E62B51 /* AVApplication.h in Headers */,
 				83FCB9BB1CEDC57C007D8712 /* LCSecurityPolicy.h in Headers */,
 				83D8CF411C17DAF50094279D /* UserAgent.h in Headers */,
 				83D8CF441C17DAF50094279D /* LCKeyValueSQL.h in Headers */,
@@ -2994,6 +3017,7 @@
 				8C841B621A5A7A0000C5C6C4 /* AVReachability.h in Headers */,
 				83FCB9CC1CEDC57C007D8712 /* LCURLResponseSerialization.h in Headers */,
 				8C841ABE1A5A7A0000C5C6C4 /* AVDuration.h in Headers */,
+				D3B44E0E2170756F00E62B51 /* AVApplication.h in Headers */,
 				8C841B661A5A7A0000C5C6C4 /* UserAgent.h in Headers */,
 				838DD7A31B3D3FD100C95897 /* LCKeyValueSQL.h in Headers */,
 				8C841AB21A5A7A0000C5C6C4 /* AVRole_Internal.h in Headers */,
@@ -3631,6 +3655,7 @@
 				70CA7F7C1BDE3721000A3B21 /* AVCacheManager.m in Sources */,
 				70CA7F7D1BDE3721000A3B21 /* AVPersistenceUtils.m in Sources */,
 				70CA7F7E1BDE3721000A3B21 /* AVScheduler.m in Sources */,
+				D3B44E132170756F00E62B51 /* AVApplication.m in Sources */,
 				83B0E5891F28375900EE1A75 /* JRSwizzle.m in Sources */,
 				70CA7F7F1BDE3721000A3B21 /* AVCloud.m in Sources */,
 				70CA7F801BDE3721000A3B21 /* AVFile.m in Sources */,
@@ -3672,6 +3697,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				83E5D9521C1AA7C000E61E37 /* AVAnalyticsUtils.m in Sources */,
+				D3B44E152170756F00E62B51 /* AVApplication.m in Sources */,
 				8320F87C1C1918C60024B45E /* AVRequestOperation.m in Sources */,
 				8320F87D1C1918C60024B45E /* AVFile.m in Sources */,
 				8320F87F1C1918C60024B45E /* LCDatabaseQueue.m in Sources */,
@@ -3802,6 +3828,7 @@
 				83D8CEA21C17DAF50094279D /* LCFileTaskManager.m in Sources */,
 				83D8CEA31C17DAF50094279D /* AVSearchSortBuilder.m in Sources */,
 				83D8CEA51C17DAF50094279D /* LCNetworkStatistics.m in Sources */,
+				D3B44E142170756F00E62B51 /* AVApplication.m in Sources */,
 				83D8CEA61C17DAF50094279D /* AVDuration.m in Sources */,
 				83D8CEA71C17DAF50094279D /* AVExceptionHandler.m in Sources */,
 				83D8CEA81C17DAF50094279D /* AVRole.m in Sources */,
@@ -3875,6 +3902,7 @@
 				8C841AE61A5A7A0000C5C6C4 /* LCFileTaskManager.m in Sources */,
 				8C841B391A5A7A0000C5C6C4 /* AVSearchSortBuilder.m in Sources */,
 				838DD7971B3D309F00C95897 /* LCNetworkStatistics.m in Sources */,
+				D3B44E122170756F00E62B51 /* AVApplication.m in Sources */,
 				8C841ABF1A5A7A0000C5C6C4 /* AVDuration.m in Sources */,
 				8C841AC11A5A7A0000C5C6C4 /* AVExceptionHandler.m in Sources */,
 				8C841AB11A5A7A0000C5C6C4 /* AVRole.m in Sources */,
