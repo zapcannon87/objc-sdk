@@ -220,7 +220,7 @@ class AVFile_TestCase: LCTestBase {
         if self.isServerTesting { return }
         
         let uploadDataTuple: (data: Data, name: String) = self.bigDataTuple
-        let documentsDirectory: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let documentsDirectory: URL = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         let filePath: URL = documentsDirectory.appendingPathComponent(uploadDataTuple.name)
         do {
             try uploadDataTuple.data.write(to: filePath, options: [.atomic])
@@ -807,9 +807,12 @@ class AVFile_TestCase: LCTestBase {
                 
                 semaphore.decrement()
                 XCTAssertTrue(Thread.isMainThread)
-                
-                XCTAssertTrue(succeeded)
-                XCTAssertNil(error)
+                if let error: NSError = error as NSError? {
+                    XCTAssertTrue(error.domain == kLeanCloudErrorDomain)
+                    XCTAssertTrue(error.code == 403)
+                } else {
+                    XCTAssertTrue(succeeded)
+                }
             })
             
         }, failure: {
