@@ -24,6 +24,7 @@
 
 #import "LCRouter_Internal.h"
 #import "SDMacros.h"
+#import "AVApplication.h"
 
 static AVVerbosePolicy _verbosePolicy = kAVVerboseShow;
 
@@ -31,26 +32,7 @@ static BOOL LCInitialized = NO;
 
 static BOOL LCSSLPinningEnabled = false;
 
-@implementation AVOSCloud {
-    
-    NSString *_applicationId;
-    
-    NSString *_applicationKey;
-}
-
-+ (instancetype)sharedInstance
-{
-    static AVOSCloud *sharedInstance = nil;
-    
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        
-        sharedInstance = [[AVOSCloud alloc] init];
-    });
-    
-    return sharedInstance;
-}
+@implementation AVOSCloud
 
 + (void)setSSLPinningEnabled:(BOOL)enabled
 {
@@ -100,8 +82,8 @@ static BOOL LCSSLPinningEnabled = false;
 
 + (void)setApplicationId:(NSString *)applicationId clientKey:(NSString *)clientKey
 {
-    [AVOSCloud sharedInstance]->_applicationId = applicationId;
-    [AVOSCloud sharedInstance]->_applicationKey = clientKey;
+    AVApplication *application = [[AVApplication alloc] initWithIdentifier:applicationId key:clientKey];
+    [AVApplication setDefaultApplication:application];
 
     if (_verbosePolicy == kAVVerboseShow) {
         [self logApplicationInfo];
@@ -133,12 +115,12 @@ static BOOL LCSSLPinningEnabled = false;
 
 + (NSString *)getApplicationId
 {
-    return [AVOSCloud sharedInstance]->_applicationId;
+    return [AVApplication defaultApplication].identifier;
 }
 
 + (NSString *)getClientKey
 {
-    return [AVOSCloud sharedInstance]->_applicationKey;
+    return [AVApplication defaultApplication].key;
 }
 
 + (void)setLastModifyEnabled:(BOOL)enabled{
