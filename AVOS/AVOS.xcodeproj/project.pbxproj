@@ -1032,6 +1032,7 @@
 		D34FD72D2068CFE900B7C11B /* AVLiveQuery_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D34FD72B2068CFE900B7C11B /* AVLiveQuery_Internal.h */; };
 		D37A04671FF36E6200AD44A9 /* testVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = D37A04661FF36E6200AD44A9 /* testVideo.mp4 */; };
 		D37A046A1FF3705500AD44A9 /* testFile.md in Resources */ = {isa = PBXBuildFile; fileRef = D37A04691FF3705500AD44A9 /* testFile.md */; };
+		D38E1DEA2175E4EB00E7F492 /* AVQueryTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38E1DE92175E4EB00E7F492 /* AVQueryTestCase.swift */; };
 		D3939CC720FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */; };
 		D3939CC820FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */; };
 		D3B44E0E2170756F00E62B51 /* AVApplication.h in Headers */ = {isa = PBXBuildFile; fileRef = D3B44E0C2170756E00E62B51 /* AVApplication.h */; };
@@ -1486,6 +1487,7 @@
 		D34FD72B2068CFE900B7C11B /* AVLiveQuery_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVLiveQuery_Internal.h; sourceTree = "<group>"; };
 		D37A04661FF36E6200AD44A9 /* testVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = testVideo.mp4; sourceTree = "<group>"; };
 		D37A04691FF3705500AD44A9 /* testFile.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = testFile.md; sourceTree = "<group>"; };
+		D38E1DE92175E4EB00E7F492 /* AVQueryTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVQueryTestCase.swift; sourceTree = "<group>"; };
 		D3939CC620FEE621001C9F5C /* AVIMClientInternalConversationManager_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVIMClientInternalConversationManager_Internal.h; sourceTree = "<group>"; };
 		D3B44E0C2170756E00E62B51 /* AVApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVApplication.h; sourceTree = "<group>"; };
 		D3B44E0D2170756F00E62B51 /* AVApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVApplication.m; sourceTree = "<group>"; };
@@ -2363,6 +2365,7 @@
 				D3472E1E2015CBC200AAD65F /* AVFileTestCase.swift */,
 				D305470E208F2F7200B547B9 /* AVCloudTestCase.swift */,
 				D336C56F212D02A2008D0E3E /* LCRouterTestCase.swift */,
+				D38E1DE92175E4EB00E7F492 /* AVQueryTestCase.swift */,
 			);
 			path = Swift;
 			sourceTree = "<group>";
@@ -3944,6 +3947,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D305470F208F2F7200B547B9 /* AVCloudTestCase.swift in Sources */,
+				D38E1DEA2175E4EB00E7F492 /* AVQueryTestCase.swift in Sources */,
 				D30DF3F71FDE2CD200F932BC /* AVUserTestCase.swift in Sources */,
 				D30DF4161FDE38EF00F932BC /* LCTestBase.swift in Sources */,
 				D336C570212D02A2008D0E3E /* LCRouterTestCase.swift in Sources */,
