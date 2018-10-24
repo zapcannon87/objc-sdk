@@ -163,7 +163,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, weak, readonly, nullable) AVIMClient *imClient;
 
-+ (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**

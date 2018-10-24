@@ -139,12 +139,6 @@ static dispatch_queue_t messageCacheOperationQueue;
     return timestamp;
 }
 
-+ (instancetype)new
-{
-    [NSException raise:NSInternalInconsistencyException format:@"not allow."];
-    return nil;
-}
-
 - (instancetype)init
 {
     [NSException raise:NSInternalInconsistencyException format:@"not allow."];

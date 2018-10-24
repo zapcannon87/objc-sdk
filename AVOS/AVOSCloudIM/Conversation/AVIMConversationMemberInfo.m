@@ -44,12 +44,6 @@ AVIMConversationMemberRole AVIMConversationMemberInfo_key_to_role(AVIMConversati
     NSLock *_lock;
 }
 
-+ (instancetype)new
-{
-    [NSException raise:NSInternalInconsistencyException format:@"not allow."];
-    return nil;
-}
-
 - (instancetype)init
 {
     [NSException raise:NSInternalInconsistencyException format:@"not allow."];

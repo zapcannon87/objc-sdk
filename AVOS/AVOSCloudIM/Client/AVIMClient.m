@@ -61,12 +61,6 @@
     [AVIMWebSocketWrapper setTimeoutIntervalInSeconds:seconds];
 }
 
-+ (instancetype)new
-{
-    [NSException raise:NSInternalInconsistencyException format:@"not allow."];
-    return nil;
-}
-
 - (instancetype)init
 {
     [NSException raise:NSInternalInconsistencyException format:@"not allow."];
