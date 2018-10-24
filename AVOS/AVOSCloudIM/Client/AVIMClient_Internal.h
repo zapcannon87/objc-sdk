@@ -31,11 +31,11 @@
 
 - (instancetype)initWithClientId:(NSString *)clientId
                              tag:(NSString *)tag
-                    installation:(AVInstallation *)installation LC_WARN_UNUSED_RESULT;
+                    installation:(AVInstallation *)installation;
 
 - (instancetype)initWithUser:(AVUser *)user
                          tag:(NSString *)tag
-                installation:(AVInstallation *)installation LC_WARN_UNUSED_RESULT;
+                installation:(AVInstallation *)installation;
 
 - (void)addOperationToInternalSerialQueue:(void (^)(AVIMClient *client))block;
 

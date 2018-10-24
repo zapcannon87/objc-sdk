@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param clientId Identifie of this Client.
  @return Instance.
  */
-- (instancetype)initWithClientId:(NSString *)clientId LC_WARN_UNUSED_RESULT;
+- (instancetype)initWithClientId:(NSString *)clientId;
 
 /**
  Initialization method.
@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param tag Set it to implement only one client online.
  @return Instance.
  */
-- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag LC_WARN_UNUSED_RESULT;
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag;
 
 /**
  Initialization method.
@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param user The `AVUser` of this Client.
  @return Instance.
  */
-- (instancetype)initWithUser:(AVUser *)user LC_WARN_UNUSED_RESULT;
+- (instancetype)initWithUser:(AVUser *)user;
 
 /**
  Initialization method.
@@ -113,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param tag Set it to implement only one client online.
  @return Instance.
  */
-- (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag LC_WARN_UNUSED_RESULT;
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag;
 
 /**
  Start a Session with Server.
@@ -213,7 +213,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param conversationId conversationId
  @return if the Conversation Exist, return the Instance; if not, return nil.
  */
-- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId LC_WARN_UNUSED_RESULT;
+- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId;
 
 
 /**
@@ -249,13 +249,13 @@ NS_ASSUME_NONNULL_BEGIN
  @param keyedConversation AVIMKeyedConversation 对象。
  @return 已绑定到当前 client 的会话。
  */
-- (AVIMConversation * _Nullable)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation LC_WARN_UNUSED_RESULT;
+- (AVIMConversation * _Nullable)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation;
 
 /*!
  构造一个对话查询对象
  @return 对话查询对象.
  */
-- (AVIMConversationQuery *)conversationQuery LC_WARN_UNUSED_RESULT;
+- (AVIMConversationQuery *)conversationQuery;
 
 /*!
  Query online clients within the given array of clients.

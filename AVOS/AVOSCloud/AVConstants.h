@@ -186,5 +186,3 @@ typedef void (^AVFileResultBlock)(AVFile * _Nullable file, NSError * _Nullable e
 typedef void (^AVDictionaryResultBlock)(NSDictionary * _Nullable dict, NSError * _Nullable error);
 
 #define AV_DEPRECATED(explain) __attribute__((deprecated(explain)))
-
-#define LC_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
