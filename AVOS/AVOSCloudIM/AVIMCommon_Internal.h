@@ -23,7 +23,7 @@ static NSString * const kAVIMUserOptionUseUnread = @"AVIMUserOptionUseUnread";
 
 /// some limit
 static NSUInteger const kClientIdLengthLimit = 64;
-static NSString * const kClientTagDefault = @"default";
+static NSString * const kClientTagReserved = @"default";
 static NSString * const kTemporaryConversationIdPrefix = @"_tmp:";
 
 /// @see https://github.com/leancloud/avoscloud-push/blob/develop/push-server/doc/protocol.md
