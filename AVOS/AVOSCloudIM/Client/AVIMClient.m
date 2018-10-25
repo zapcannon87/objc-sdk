@@ -37,22 +37,44 @@
 + (void)initialize
 {
 #if DEBUG
-    AVIMErrorCommand *errorCommand = [AVIMErrorCommand new];
-    assert([kAVIMCodeKey isEqualToString:keyPath(errorCommand, code)]);
-    assert([kAVIMAppCodeKey isEqualToString:keyPath(errorCommand, appCode)]);
-    assert([kAVIMDetailKey isEqualToString:keyPath(errorCommand, detail)]);
-    assert([kAVIMReasonKey isEqualToString:keyPath(errorCommand, reason)]);
-    AVIMConversation *conv = [AVIMConversation alloc];
-    assert([AVIMConversationUpdatedKeyLastMessage isEqualToString:keyPath(conv, lastMessage)]);
-    assert([AVIMConversationUpdatedKeyLastMessageAt isEqualToString:keyPath(conv, lastMessageAt)]);
-    assert([AVIMConversationUpdatedKeyLastReadAt isEqualToString:keyPath(conv, lastReadAt)]);
-    assert([AVIMConversationUpdatedKeyLastDeliveredAt isEqualToString:keyPath(conv, lastDeliveredAt)]);
-    assert([AVIMConversationUpdatedKeyUnreadMessagesCount isEqualToString:keyPath(conv, unreadMessagesCount)]);
-    assert([AVIMConversationUpdatedKeyUnreadMessagesMentioned isEqualToString:keyPath(conv, unreadMessagesMentioned)]);
+    if (self == [AVIMClient self]) {
+        AVIMErrorCommand *errorCommand = [AVIMErrorCommand new];
+        AVIMConversation *conv = [AVIMConversation alloc];
+        // some user info key of error should equal to command's property name.
+        assert([kAVIMCodeKey isEqualToString:keyPath(errorCommand, code)]);
+        assert([kAVIMAppCodeKey isEqualToString:keyPath(errorCommand, appCode)]);
+        assert([kAVIMDetailKey isEqualToString:keyPath(errorCommand, detail)]);
+        assert([kAVIMReasonKey isEqualToString:keyPath(errorCommand, reason)]);
+        // conversation updated key should equal to conversation's property name.
+        assert([AVIMConversationUpdatedKeyLastMessage isEqualToString:keyPath(conv, lastMessage)]);
+        assert([AVIMConversationUpdatedKeyLastMessageAt isEqualToString:keyPath(conv, lastMessageAt)]);
+        assert([AVIMConversationUpdatedKeyLastReadAt isEqualToString:keyPath(conv, lastReadAt)]);
+        assert([AVIMConversationUpdatedKeyLastDeliveredAt isEqualToString:keyPath(conv, lastDeliveredAt)]);
+        assert([AVIMConversationUpdatedKeyUnreadMessagesCount isEqualToString:keyPath(conv, unreadMessagesCount)]);
+        assert([AVIMConversationUpdatedKeyUnreadMessagesMentioned isEqualToString:keyPath(conv, unreadMessagesMentioned)]);
+        // conversation table key of local DB should equal to conversation's property name.
+        assert([keyPath(conv, conversationId) isEqualToString:AVIMConversationCacheKeyConversationID]);
+        assert([keyPath(conv, creator) isEqualToString:AVIMConversationCacheKeyCreator]);
+        assert([keyPath(conv, createAt) isEqualToString:AVIMConversationCacheKeyCreateAt]);
+        assert([keyPath(conv, updateAt) isEqualToString:AVIMConversationCacheKeyUpdateAt]);
+        assert([keyPath(conv, lastMessage) isEqualToString:AVIMConversationCacheKeyLastMessage]);
+        assert([keyPath(conv, lastMessageAt) isEqualToString:AVIMConversationCacheKeyLastMessageAt]);
+        assert([keyPath(conv, lastReadAt) isEqualToString:AVIMConversationCacheKeyLastReadAt]);
+        assert([keyPath(conv, lastDeliveredAt) isEqualToString:AVIMConversationCacheKeyLastDeliveredAt]);
+        assert([keyPath(conv, unreadMessagesCount) isEqualToString:AVIMConversationCacheKeyUnreadMessagesCount]);
+        assert([keyPath(conv, unreadMessagesMentioned) isEqualToString:AVIMConversationCacheKeyUnreadMessagesMentioned]);
+        assert([keyPath(conv, name) isEqualToString:AVIMConversationCacheKeyName]);
+        assert([keyPath(conv, members) isEqualToString:AVIMConversationCacheKeyMembers]);
+        assert([keyPath(conv, attributes) isEqualToString:AVIMConversationCacheKeyAttributes]);
+        assert([keyPath(conv, uniqueId) isEqualToString:AVIMConversationCacheKeyUniqueId]);
+        assert([keyPath(conv, unique) isEqualToString:AVIMConversationCacheKeyUnique]);
+        assert([keyPath(conv, system) isEqualToString:AVIMConversationCacheKeySystem]);
+        assert([keyPath(conv, muted) isEqualToString:AVIMConversationCacheKeyMuted]);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    assert([kAVIMUserOptionUseUnread isEqualToString:AVIMUserOptionUseUnread]);
+        assert([kAVIMUserOptionUseUnread isEqualToString:AVIMUserOptionUseUnread]);
 #pragma clang diagnostic pop
+    }
 #endif
 }
 
