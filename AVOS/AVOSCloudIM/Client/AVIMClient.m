@@ -16,14 +16,13 @@
 #import "AVIMTypedMessage_Internal.h"
 #import "AVIMSignature.h"
 #import "AVIMGenericCommand+AVIMMessagesAdditions.h"
-
 #import "LCIMConversationCache.h"
 #import "AVIMErrorUtil.h"
-
 #import "UserAgent.h"
 #import "AVUtils.h"
 #import "AVPaasClient.h"
 #import "AVErrorUtils.h"
+#import "AVApplication.h"
 
 @implementation AVIMClient {
     int64_t _sessionConfigBitmap;
@@ -98,15 +97,25 @@
 
 - (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
 {
-    return [self initWithClientId:clientId tag:tag installation:AVInstallation.defaultInstallation];
+    AVInstallation *installation = [AVInstallation defaultInstallation];
+    return [self initWithClientId:clientId tag:tag installation:installation];
 }
 
-- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag installation:(AVInstallation *)installation
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
+                    installation:(AVInstallation *)installation
+{
+    AVApplication *application = [AVApplication defaultApplication];
+    return [self initWithClientId:clientId tag:tag installation:installation application:application];
+}
+
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
+                    installation:(AVInstallation *)installation
+                     application:(AVApplication *)application
 {
     self = [super init];
     if (self) {
         self->_user = nil;
-        [self doInitializationWithClientId:clientId tag:tag installation:installation];
+        [self doInitializationWithApplication:application installation:installation clientId:clientId tag:tag];
     }
     return self;
 }
@@ -118,38 +127,43 @@
 
 - (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
 {
-    return [self initWithUser:user tag:tag installation:AVInstallation.defaultInstallation];
+    AVInstallation *installation = [AVInstallation defaultInstallation];
+    return [self initWithUser:user tag:tag installation:installation];
 }
 
-- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag installation:(AVInstallation *)installation
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
+                installation:(AVInstallation *)installation
+{
+    AVApplication *application = [AVApplication defaultApplication];
+    return [self initWithUser:user tag:tag installation:installation application:application];
+}
+
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
+                installation:(AVInstallation *)installation
+                 application:(AVApplication *)application
 {
     self = [super init];
     if (self) {
         self->_user = user;
-        [self doInitializationWithClientId:user.objectId tag:tag installation:installation];
+        NSString *clientId = user.objectId;
+        [self doInitializationWithApplication:application installation:installation clientId:clientId tag:tag];
     }
     return self;
 }
 
-- (void)doInitializationWithClientId:(NSString *)clientId
-                                 tag:(NSString *)tag
-                        installation:(AVInstallation *)installation
+- (void)doInitializationWithApplication:(AVApplication *)application
+                           installation:(AVInstallation *)installation
+                               clientId:(NSString *)clientId
+                                    tag:(NSString *)tag
 {
-    self->_clientId = ({
-        if (!clientId || clientId.length > kClientIdLengthLimit || clientId.length == 0) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"clientId invalid or length not in range [1 %lu].", kClientIdLengthLimit];
-        }
-        clientId.copy;
-    });
+    NSParameterAssert(application.identifier.length && application.key.length);
+    NSParameterAssert(installation);
+    NSAssert(clientId.length >= 1 && clientId.length <= kClientIdLengthLimit, @"clientId's length should in range [1 %lu].", kClientIdLengthLimit);
+    NSAssert(![tag isEqualToString:kClientTagReserved], @"%@ is reserved, should not use it.", kClientTagReserved);
     
-    self->_tag = ({
-        if ([tag isEqualToString:kClientTagDefault]) {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"%@ is reserved.", kClientTagDefault];
-        }
-        (tag ? tag.copy : nil);
-    });
+    self->_application = application;
+    self->_clientId = [clientId copy];
+    self->_tag = [tag copy];
     
     self->_status = AVIMClientStatusNone;
     
@@ -286,7 +300,7 @@
                     
                     outCommand.cmd = AVIMCommandType_Session;
                     outCommand.op = AVIMOpType_Open;
-                    outCommand.appId = [AVOSCloud getApplicationId];
+                    outCommand.appId = client.application.identifier;
                     outCommand.peerId = client->_clientId;
                     outCommand.sessionMessage = sessionCommand;
                     
@@ -381,7 +395,7 @@
         AVIMSessionCommand *sessionCommand = [AVIMSessionCommand new];
         outCommand.cmd = AVIMCommandType_Session;
         outCommand.op = AVIMOpType_Open;
-        outCommand.appId = [AVOSCloud getApplicationId];
+        outCommand.appId = self.application.identifier;
         outCommand.peerId = self->_clientId;
         outCommand.sessionMessage = sessionCommand;
         sessionCommand.r = true;

@@ -6,17 +6,19 @@
 //  Copyright (c) 2014 LeanCloud Inc. All rights reserved.
 //
 
-#import "AVIMCommon_Internal.h"
 #import "AVIMClient.h"
+#import "AVIMCommon_Internal.h"
 #import "AVIMWebSocketWrapper.h"
 
 @class LCIMConversationCache;
 @class AVIMClientInternalConversationManager;
 @class AVIMClientPushManager;
 @class AVIMSignature;
+@class AVApplication;
 
 @interface AVIMClient () <AVIMWebSocketWrapperDelegate>
 
+@property (nonatomic, strong, readonly) AVApplication *application;
 @property (nonatomic, strong, readonly) dispatch_queue_t internalSerialQueue;
 @property (nonatomic, strong, readonly) dispatch_queue_t signatureQueue;
 @property (nonatomic, strong, readonly) dispatch_queue_t userInteractQueue;
