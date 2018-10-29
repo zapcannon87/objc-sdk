@@ -50,118 +50,146 @@ NS_ASSUME_NONNULL_BEGIN
 @interface AVIMConversation : NSObject
 
 /**
- *  The ID of the client which the conversation belongs to.
+ The client which this conversation belongs to.
  */
-@property (nonatomic, strong, readonly, nullable) NSString *clientId;
+@property (nonatomic, weak, readonly, nullable) AVIMClient *imClient;
 
 /**
- *  The ID of the conversation.
+ The ID of the client.
  */
-@property (nonatomic, strong, readonly, nullable) NSString *conversationId;
+@property (nonatomic, strong, readonly, nonnull) NSString *clientId;
 
 /**
- *  The clientId of the conversation creator.
+ The ID of the conversation.
  */
-@property (nonatomic, strong, readonly, nullable) NSString *creator;
+@property (nonatomic, strong, readonly, nonnull) NSString *conversationId;
 
 /**
- *  The creation time of the conversation.
- */
-@property (nonatomic, strong, readonly, nullable) NSDate *createAt;
-
-/**
- *  The last updating time of the conversation. When fields like name, members changes, this time will changes.
- */
-@property (nonatomic, strong, readonly, nullable) NSDate *updateAt;
-
-/**
- *  The last message in this conversation.
- *  @attention Getter method may query lastMessage from SQL, this may take a long time, be careful to use getter method in main thread.
- */
-@property (nonatomic, strong, readonly, nullable) AVIMMessage *lastMessage;
-
-/**
- *  The send timestamp of the last message in this conversation.
- */
-@property (nonatomic, strong, readonly, nullable) NSDate *lastMessageAt;
-
-/**
- *  The last timestamp your message read by other.
- */
-@property (nonatomic, strong, readonly, nullable) NSDate *lastReadAt;
-
-/**
- *  The last timestamp your message delivered to other.
- */
-@property (nonatomic, strong, readonly, nullable) NSDate *lastDeliveredAt;
-
-/**
- *  The count of unread messages in current conversation.
- */
-@property (nonatomic, assign, readonly) NSUInteger unreadMessagesCount;
-
-/**
- *  A flag indicates whether an unread message mentioned you.
- */
-@property (nonatomic, assign) BOOL unreadMessagesMentioned;
-
-/**
- *  The name of this conversation. Can be changed by update:callback: .
- */
-@property (nonatomic, strong, readonly, nullable) NSString *name;
-
-/**
- *  The ids of the clients who join the conversation. Can be changed by addMembersWithClientIds:callback: or removeMembersWithClientIds:callback: .
- */
-@property (nonatomic, strong, readonly, nullable) NSArray<NSString *> *members;
-
-/**
- *  The attributes of the conversation. Intend to save any extra data of the conversation.
- *  Can be set when creating the conversation or can be updated by update:callback: .
- */
-@property (nonatomic, strong, readonly, nullable) NSDictionary *attributes;
-
-/**
- Unique ID of Unique Conversation.
+ Unique ID of conversation, only unique conversation has this property.
  */
 @property (nonatomic, strong, readonly, nullable) NSString *uniqueId;
 
 /**
- Indicate whether it is a unique conversation.
+ The creator of the conversation.
+ */
+@property (nonatomic, strong, readonly, nullable) NSString *creator;
+
+/**
+ The creation date of the conversation.
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *createAt;
+
+/**
+ Indicating whether it is a unique conversation.
+ @note only 0 or 1 property in [unique, transient, system, temporary] is true.
  */
 @property (nonatomic, assign, readonly) BOOL unique;
 
 /**
- *  Indicate whether it is a transient conversation. 
- *  @see AVIMConversationOptionTransient
+ Indicating whether it is a Chat Room.
+ @note only 0 or 1 property in [unique, transient, system, temporary] is true.
  */
 @property (nonatomic, assign, readonly) BOOL transient;
 
 /**
- Indicate whether it is a system conversation.
+ Indicating whether it is a Service Conversation.
+ @note only 0 or 1 property in [unique, transient, system, temporary] is true.
  */
 @property (nonatomic, assign, readonly) BOOL system;
 
 /**
- Indicate whether it is a temporary conversation.
+ Indicating whether it is a Temporary Conversation.
+ @note only 0 or 1 property in [unique, transient, system, temporary] is true.
  */
 @property (nonatomic, assign, readonly) BOOL temporary;
 
 /**
- Temporary Conversation's Time to Live.
+ Temporary Conversation's Time to Live. only Temporary Conversation has a valid value.
  */
 @property (nonatomic, assign, readonly) NSUInteger temporaryTTL;
 
 /**
- *  Muting status. If muted, when you have offline messages, will not receive Apple APNS notification.
- *  Can be changed by muteWithCallback: or unmuteWithCallback:.
+ The last updated date of the conversation,
+ When fields like name, members, attributes ... changed, this value in server will changed.
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *updateAt;
+
+/**
+ The last message in this conversation.
+ @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:].
+ */
+@property (nonatomic, strong, readonly, nullable) AVIMMessage *lastMessage;
+
+/**
+ The sent date of the last message in this conversation.
+ @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:].
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *lastMessageAt;
+
+/**
+ The last date of this client ID's message read by other.
+ @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:], -[self fetchReceiptTimestampsInBackground].
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *lastReadAt;
+
+/**
+ The last date of this client ID's message delivered to other.
+  @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:], -[self fetchReceiptTimestampsInBackground].
+ */
+@property (nonatomic, strong, readonly, nullable) NSDate *lastDeliveredAt;
+
+/**
+ The count of unread messages in this conversation.
+ @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:].
+ */
+@property (nonatomic, assign, readonly) NSUInteger unreadMessagesCount;
+
+/**
+ Indicating whether has one or more unread message mentioned this client ID,
+ Should set this property to `false` when read the message.
+ @note See-Also: AVIMConversationUpdatedKey, -[AVIMClientDelegate conversation:didUpdateForKey:].
+ */
+@property (nonatomic, assign) BOOL unreadMessagesMentioned;
+
+/**
+ Indicating whether this conversation's data maybe not sync with server's data,
+ When this conversation did fetch or did query, this property will be `true`.
+ */
+@property (nonatomic, assign, readonly) BOOL shouldFetch;
+
+/**
+ The member's ID of this conversation.
+ @note See-Also: -[self joinWithCallback:], -[self quitWithCallback:],
+ -[self addMembersWithClientIds:callback:], -[self removeMembersWithClientIds:callback:],
+ -[AVIMClientDelegate conversation:invitedByClientId:], -[AVIMClientDelegate conversation:kickedByClientId:],
+ -[AVIMClientDelegate conversation:membersAdded:byClientId:], -[AVIMClientDelegate conversation:membersRemoved:byClientId:].
+ */
+@property (nonatomic, strong, readonly, nullable) NSArray<NSString *> *members;
+
+/**
+ The member's ID of which has mute this conversation.
+ @note See-Also: muted, -[self muteWithCallback:], -[self unmuteWithCallback:].
+ */
+@property (nonatomic, strong, readonly, nullable) NSArray<NSString *> *mutedMembers;
+
+/**
+ Muting status of this client ID in this conversation.
+ If this property is true(`mutedMembers` contains this client ID), then all device opened by this client ID will not receive system's notification when this client ID has offline messages.
+ @note See-Also: mutedMembers, -[self muteWithCallback:], -[self unmuteWithCallback:].
  */
 @property (nonatomic, assign, readonly) BOOL muted;
 
 /**
- *  The AVIMClient object which this conversation belongs to.
+ The name of this conversation.
+ @note See-Also: -[self updateWithCallback:].
  */
-@property (nonatomic, weak, readonly, nullable) AVIMClient *imClient;
+@property (nonatomic, strong, readonly, nullable) NSString *name;
+
+/**
+ The attributes of the conversation, apply to saving any extra data of the conversation.
+ @note See-Also: -[self updateWithCallback:].
+ */
+@property (nonatomic, strong, readonly, nullable) NSDictionary *attributes;
 
 - (instancetype)init NS_UNAVAILABLE;
 
