@@ -53,8 +53,11 @@
         assert([AVIMConversationUpdatedKeyUnreadMessagesMentioned isEqualToString:keyPath(conv, unreadMessagesMentioned)]);
         // conversation table key of local DB should equal to conversation's property name.
         assert([keyPath(conv, conversationId) isEqualToString:AVIMConversationCacheKeyConversationID]);
+        assert([keyPath(conv, uniqueId) isEqualToString:AVIMConversationCacheKeyUniqueID]);
         assert([keyPath(conv, creator) isEqualToString:AVIMConversationCacheKeyCreator]);
         assert([keyPath(conv, createAt) isEqualToString:AVIMConversationCacheKeyCreateAt]);
+        assert([keyPath(conv, unique) isEqualToString:AVIMConversationCacheKeyUnique]);
+        assert([keyPath(conv, system) isEqualToString:AVIMConversationCacheKeySystem]);
         assert([keyPath(conv, updateAt) isEqualToString:AVIMConversationCacheKeyUpdateAt]);
         assert([keyPath(conv, lastMessage) isEqualToString:AVIMConversationCacheKeyLastMessage]);
         assert([keyPath(conv, lastMessageAt) isEqualToString:AVIMConversationCacheKeyLastMessageAt]);
@@ -62,13 +65,11 @@
         assert([keyPath(conv, lastDeliveredAt) isEqualToString:AVIMConversationCacheKeyLastDeliveredAt]);
         assert([keyPath(conv, unreadMessagesCount) isEqualToString:AVIMConversationCacheKeyUnreadMessagesCount]);
         assert([keyPath(conv, unreadMessagesMentioned) isEqualToString:AVIMConversationCacheKeyUnreadMessagesMentioned]);
-        assert([keyPath(conv, name) isEqualToString:AVIMConversationCacheKeyName]);
+        assert([keyPath(conv, shouldFetch) isEqualToString:AVIMConversationCacheKeyShouldFetch]);
         assert([keyPath(conv, members) isEqualToString:AVIMConversationCacheKeyMembers]);
+        assert([keyPath(conv, mutedMembers) isEqualToString:AVIMConversationCacheKeyMutedMembers]);
+        assert([keyPath(conv, name) isEqualToString:AVIMConversationCacheKeyName]);
         assert([keyPath(conv, attributes) isEqualToString:AVIMConversationCacheKeyAttributes]);
-        assert([keyPath(conv, uniqueId) isEqualToString:AVIMConversationCacheKeyUniqueId]);
-        assert([keyPath(conv, unique) isEqualToString:AVIMConversationCacheKeyUnique]);
-        assert([keyPath(conv, system) isEqualToString:AVIMConversationCacheKeySystem]);
-        assert([keyPath(conv, muted) isEqualToString:AVIMConversationCacheKeyMuted]);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
         assert([kAVIMUserOptionUseUnread isEqualToString:AVIMUserOptionUseUnread]);
