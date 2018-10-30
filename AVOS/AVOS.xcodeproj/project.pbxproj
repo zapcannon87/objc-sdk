@@ -1030,6 +1030,12 @@
 		D34EBDD0211C20FF0092A538 /* LCRouter_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D34EBDCC211C20FF0092A538 /* LCRouter_Internal.h */; };
 		D34FD72C2068CFE900B7C11B /* AVLiveQuery_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D34FD72B2068CFE900B7C11B /* AVLiveQuery_Internal.h */; };
 		D34FD72D2068CFE900B7C11B /* AVLiveQuery_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D34FD72B2068CFE900B7C11B /* AVLiveQuery_Internal.h */; };
+		D36438102181651B0035A9C4 /* AVIMConversationCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D364380E2181651B0035A9C4 /* AVIMConversationCache.h */; };
+		D36438112181651B0035A9C4 /* AVIMConversationCache.h in Headers */ = {isa = PBXBuildFile; fileRef = D364380E2181651B0035A9C4 /* AVIMConversationCache.h */; };
+		D36438122181651B0035A9C4 /* AVIMConversationCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D364380F2181651B0035A9C4 /* AVIMConversationCache.m */; };
+		D36438132181651B0035A9C4 /* AVIMConversationCache.m in Sources */ = {isa = PBXBuildFile; fileRef = D364380F2181651B0035A9C4 /* AVIMConversationCache.m */; };
+		D3643815218165490035A9C4 /* AVIMConversationCache_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3643814218165490035A9C4 /* AVIMConversationCache_Internal.h */; };
+		D3643816218165490035A9C4 /* AVIMConversationCache_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = D3643814218165490035A9C4 /* AVIMConversationCache_Internal.h */; };
 		D37A04671FF36E6200AD44A9 /* testVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = D37A04661FF36E6200AD44A9 /* testVideo.mp4 */; };
 		D37A046A1FF3705500AD44A9 /* testFile.md in Resources */ = {isa = PBXBuildFile; fileRef = D37A04691FF3705500AD44A9 /* testFile.md */; };
 		D38E1DEA2175E4EB00E7F492 /* AVQueryTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38E1DE92175E4EB00E7F492 /* AVQueryTestCase.swift */; };
@@ -1485,6 +1491,9 @@
 		D3472E1E2015CBC200AAD65F /* AVFileTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVFileTestCase.swift; sourceTree = "<group>"; };
 		D34EBDCC211C20FF0092A538 /* LCRouter_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LCRouter_Internal.h; sourceTree = "<group>"; };
 		D34FD72B2068CFE900B7C11B /* AVLiveQuery_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVLiveQuery_Internal.h; sourceTree = "<group>"; };
+		D364380E2181651B0035A9C4 /* AVIMConversationCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVIMConversationCache.h; sourceTree = "<group>"; };
+		D364380F2181651B0035A9C4 /* AVIMConversationCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AVIMConversationCache.m; sourceTree = "<group>"; };
+		D3643814218165490035A9C4 /* AVIMConversationCache_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AVIMConversationCache_Internal.h; sourceTree = "<group>"; };
 		D37A04661FF36E6200AD44A9 /* testVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = testVideo.mp4; sourceTree = "<group>"; };
 		D37A04691FF3705500AD44A9 /* testFile.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = testFile.md; sourceTree = "<group>"; };
 		D38E1DE92175E4EB00E7F492 /* AVQueryTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVQueryTestCase.swift; sourceTree = "<group>"; };
@@ -2392,6 +2401,9 @@
 				8C841BD11A5A84C600C5C6C4 /* AVIMConversation.h */,
 				8C841BD01A5A84C600C5C6C4 /* AVIMConversation_Internal.h */,
 				8C841BD21A5A84C600C5C6C4 /* AVIMConversation.m */,
+				D364380E2181651B0035A9C4 /* AVIMConversationCache.h */,
+				D3643814218165490035A9C4 /* AVIMConversationCache_Internal.h */,
+				D364380F2181651B0035A9C4 /* AVIMConversationCache.m */,
 				D31126A2208F1C7900812135 /* AVIMConversationMemberInfo.h */,
 				D31126A3208F1C7A00812135 /* AVIMConversationMemberInfo_Internal.h */,
 				D31126A1208F1C7900812135 /* AVIMConversationMemberInfo.m */,
@@ -2524,6 +2536,7 @@
 				704F3BFA1BE0D0820033245C /* AVIMFileMessage.h in Headers */,
 				9AD27C4C1E1418DB002F9C7C /* LCIMEmpty.pbobjc.h in Headers */,
 				704F3BBE1BE0D07E0033245C /* AVIMCommon.h in Headers */,
+				D36438112181651B0035A9C4 /* AVIMConversationCache.h in Headers */,
 				704F3BD01BE0D07F0033245C /* AVOSCloudIM.h in Headers */,
 				9AD27C501E1418DB002F9C7C /* LCIMFieldMask.pbobjc.h in Headers */,
 				704F3BBC1BE0D07E0033245C /* AVIMClient_Internal.h in Headers */,
@@ -2592,6 +2605,7 @@
 				704F3BFC1BE0D0830033245C /* AVIMRuntimeHelper.h in Headers */,
 				704F3BFD1BE0D0830033245C /* AVIMErrorUtil.h in Headers */,
 				9A2F1B6F1CF6F6FA00BE52F2 /* LCIMUtilities_PackagePrivate.h in Headers */,
+				D3643816218165490035A9C4 /* AVIMConversationCache_Internal.h in Headers */,
 				9A2F1B451CF6F6FA00BE52F2 /* LCIMProtocolBuffers.h in Headers */,
 				704F3C001BE0D0830033245C /* AVIMWebSocketWrapper.h in Headers */,
 				9AD27C5C1E1418DB002F9C7C /* LCIMTimestamp.pbobjc.h in Headers */,
@@ -3066,6 +3080,7 @@
 				9A2F1B401CF6F6FA00BE52F2 /* LCIMMessage_PackagePrivate.h in Headers */,
 				9AD27C4B1E1418DB002F9C7C /* LCIMEmpty.pbobjc.h in Headers */,
 				9AD392461BFC411300D28074 /* AVIMGenericCommand+AVIMMessagesAdditions.h in Headers */,
+				D36438102181651B0035A9C4 /* AVIMConversationCache.h in Headers */,
 				9A2F1AFE1CF6F6FA00BE52F2 /* LCIMArray.h in Headers */,
 				9AD27C4F1E1418DB002F9C7C /* LCIMFieldMask.pbobjc.h in Headers */,
 				8C9A927F1A70AF5C00CA4912 /* AVIMTypedMessage_Internal.h in Headers */,
@@ -3134,6 +3149,7 @@
 				9A2F1B551CF6F6FA00BE52F2 /* LCIMUnknownField.h in Headers */,
 				834775DC1B2A693400B5AF2E /* AVIMKeyedConversation_internal.h in Headers */,
 				8C895DE41A78A5D900992A8F /* AVMPMessagePackWriter.h in Headers */,
+				D3643815218165490035A9C4 /* AVIMConversationCache_Internal.h in Headers */,
 				8C895DE61A78A5D900992A8F /* AVMPOrderedDictionary.h in Headers */,
 				8C895DE01A78A5D900992A8F /* AVMPMessagePackReader.h in Headers */,
 				9AD27C5B1E1418DB002F9C7C /* LCIMTimestamp.pbobjc.h in Headers */,
@@ -3568,6 +3584,7 @@
 				9AD27C5A1E1418DB002F9C7C /* LCIMStruct.pbobjc.m in Sources */,
 				704F3B8E1BE0D05C0033245C /* AVMPMessagePackWriter.m in Sources */,
 				704F3B8F1BE0D05C0033245C /* AVMPOrderedDictionary.m in Sources */,
+				D36438132181651B0035A9C4 /* AVIMConversationCache.m in Sources */,
 				9A2F1B751CF6F6FA00BE52F2 /* LCIMWellKnownTypes.m in Sources */,
 				9AD27C4A1E1418DB002F9C7C /* LCIMDuration.pbobjc.m in Sources */,
 				9A2F1B4E1CF6F6FA00BE52F2 /* LCIMRootObject.m in Sources */,
@@ -3979,6 +3996,7 @@
 				9AD392431BFC395200D28074 /* AVIMConversationOutCommand.m in Sources */,
 				8C841C0D1A5A84C600C5C6C4 /* AVIMClient.m in Sources */,
 				9A2F1B731CF6F6FA00BE52F2 /* LCIMWellKnownTypes.m in Sources */,
+				D36438122181651B0035A9C4 /* AVIMConversationCache.m in Sources */,
 				9AD27C491E1418DB002F9C7C /* LCIMDuration.pbobjc.m in Sources */,
 				9A2F1B4C1CF6F6FA00BE52F2 /* LCIMRootObject.m in Sources */,
 				8C895DE71A78A5D900992A8F /* AVMPOrderedDictionary.m in Sources */,
