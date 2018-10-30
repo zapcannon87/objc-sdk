@@ -72,7 +72,6 @@
     __weak AVIMClient *_imClient;
     NSString *_clientId;
     NSString *_conversationId;
-    LCIMConvType _convType;
     
     // public mutable
     AVIMMessage *_lastMessage;
