@@ -66,6 +66,11 @@ static RTMNotificationKey RTMNotificationKeyOpMembersUnblocked = @"members-unblo
 static RTMNotificationKey RTMNotificationKeyOpUpdated = @"updated";
 static RTMNotificationKey RTMNotificationKeyOpMemberInfoChanged = @"member-info-changed";
 
+/// table name of local DB
+typedef NSString * const AVIMLocalDBTableName NS_TYPED_EXTENSIBLE_ENUM;
+static AVIMLocalDBTableName AVIMLocalDBTableNameConversation = @"conversation";
+static AVIMLocalDBTableName AVIMLocalDBTableNameMessage = @"message";
+
 /// conversation table key of LeanCloud
 typedef NSString * const AVIMConversationKey NS_TYPED_EXTENSIBLE_ENUM;
 static AVIMConversationKey AVIMConversationKeyObjectId = @"objectId";
@@ -96,8 +101,11 @@ static AVIMConversationKey AVIMConversationKeyLastMessageMentionPids = @"mention
 /// conversation table key of local DB
 typedef NSString * const AVIMConversationCacheKey NS_TYPED_EXTENSIBLE_ENUM;
 static AVIMConversationCacheKey AVIMConversationCacheKeyConversationID = @"conversationId";
+static AVIMConversationCacheKey AVIMConversationCacheKeyUniqueID = @"uniqueId";
 static AVIMConversationCacheKey AVIMConversationCacheKeyCreator = @"creator";
 static AVIMConversationCacheKey AVIMConversationCacheKeyCreateAt = @"createAt";
+static AVIMConversationCacheKey AVIMConversationCacheKeyUnique = @"unique";
+static AVIMConversationCacheKey AVIMConversationCacheKeySystem = @"system";
 static AVIMConversationCacheKey AVIMConversationCacheKeyUpdateAt = @"updateAt";
 static AVIMConversationCacheKey AVIMConversationCacheKeyLastMessage = @"lastMessage";
 static AVIMConversationCacheKey AVIMConversationCacheKeyLastMessageAt = @"lastMessageAt";
@@ -105,13 +113,12 @@ static AVIMConversationCacheKey AVIMConversationCacheKeyLastReadAt = @"lastReadA
 static AVIMConversationCacheKey AVIMConversationCacheKeyLastDeliveredAt = @"lastDeliveredAt";
 static AVIMConversationCacheKey AVIMConversationCacheKeyUnreadMessagesCount = @"unreadMessagesCount";
 static AVIMConversationCacheKey AVIMConversationCacheKeyUnreadMessagesMentioned = @"unreadMessagesMentioned";
-static AVIMConversationCacheKey AVIMConversationCacheKeyName = @"name";
+static AVIMConversationCacheKey AVIMConversationCacheKeyShouldFetch = @"shouldFetch";
 static AVIMConversationCacheKey AVIMConversationCacheKeyMembers = @"members";
+static AVIMConversationCacheKey AVIMConversationCacheKeyMutedMembers = @"mutedMembers";
+static AVIMConversationCacheKey AVIMConversationCacheKeyName = @"name";
 static AVIMConversationCacheKey AVIMConversationCacheKeyAttributes = @"attributes";
-static AVIMConversationCacheKey AVIMConversationCacheKeyUniqueId = @"uniqueId";
-static AVIMConversationCacheKey AVIMConversationCacheKeyUnique = @"unique";
-static AVIMConversationCacheKey AVIMConversationCacheKeySystem = @"system";
-static AVIMConversationCacheKey AVIMConversationCacheKeyMuted = @"muted";
+
 
 /// Use this enum to match command's value(`convType`)
 typedef NS_ENUM(NSUInteger, LCIMConvType) {
