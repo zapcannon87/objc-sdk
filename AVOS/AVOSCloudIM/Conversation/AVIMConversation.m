@@ -1764,9 +1764,9 @@ static void process_attr_and_attrModified(NSDictionary *attr, NSDictionary *attr
     return clientId && conversationId ? [[LCIMMessageCacheStore alloc] initWithClientId:clientId conversationId:conversationId] : nil;
 }
 
-- (LCIMConversationCache *)conversationCache {
-    return self->_imClient.conversationCache;
-}
+//- (LCIMConversationCache *)conversationCache {
+//    return self->_imClient.conversationCache;
+//}
 
 - (void)cacheContinuousMessages:(NSArray *)messages
                     plusMessage:(AVIMMessage *)message
@@ -1790,7 +1790,7 @@ static void process_attr_and_attrModified(NSDictionary *attr, NSDictionary *attr
 
 - (void)removeCachedConversation
 {
-    [[self conversationCache] removeConversationForId:self.conversationId];
+//    [[self conversationCache] removeConversationForId:self.conversationId];
 }
 
 - (void)removeCachedMessages

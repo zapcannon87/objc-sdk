@@ -154,7 +154,7 @@ static NSUInteger batchQueryLimit = 20;
                     }
                 }
                 if (!isTemporary) {
-                    [client.conversationCache cacheConversations:@[conversation] maxAge:3600 forCommand:commandWrapper.outCommand.avim_conversationForCache];
+//                    [client.conversationCache cacheConversations:@[conversation] maxAge:3600 forCommand:commandWrapper.outCommand.avim_conversationForCache];
                 }
                 [remainingIds removeObject:conversationId];
                 [self invokeCallbacksWithId:conversationId conversation:conversation error:nil];

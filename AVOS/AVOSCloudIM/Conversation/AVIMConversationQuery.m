@@ -462,7 +462,7 @@
         });
         
         if (self.cachePolicy != kAVIMCachePolicyIgnoreCache) {
-            [client.conversationCache cacheConversations:conversations maxAge:self.cacheMaxAge forCommand:commandWrapper.outCommand.avim_conversationForCache];
+//            [client.conversationCache cacheConversations:conversations maxAge:self.cacheMaxAge forCommand:commandWrapper.outCommand.avim_conversationForCache];
         }
         
         [self invokeInUserInteractQueue:^{
@@ -631,7 +631,8 @@
                                callback:(void(^)(NSArray *conversations))callback
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray *conversations = [client.conversationCache conversationsForCommand:outCommand.avim_conversationForCache];
+        NSArray *conversations;
+//        = [client.conversationCache conversationsForCommand:outCommand.avim_conversationForCache];
         [client addOperationToInternalSerialQueue:^(AVIMClient *client) {
             NSMutableArray *results = [NSMutableArray array];
             for (AVIMConversation *conv in conversations) {
