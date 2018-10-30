@@ -83,13 +83,13 @@
     [AVIMWebSocketWrapper setTimeoutIntervalInSeconds:seconds];
 }
 
+// MARK: - Init
+
 - (instancetype)init
 {
     [NSException raise:NSInternalInconsistencyException format:@"not allow."];
     return nil;
 }
-
-// MARK: - Init
 
 - (instancetype)initWithClientId:(NSString *)clientId
 {
@@ -98,27 +98,15 @@
 
 - (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
 {
-    AVInstallation *installation = [AVInstallation defaultInstallation];
-    return [self initWithClientId:clientId tag:tag installation:installation];
+    return [self initWithClientId:clientId tag:tag cacheOption:nil];
 }
 
-- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
-                    installation:(AVInstallation *)installation
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag cacheOption:(AVIMClientCacheOption *)cacheOption
 {
-    AVApplication *application = [AVApplication defaultApplication];
-    return [self initWithClientId:clientId tag:tag installation:installation application:application];
-}
-
-- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString *)tag
-                    installation:(AVInstallation *)installation
-                     application:(AVApplication *)application
-{
-    self = [super init];
-    if (self) {
-        self->_user = nil;
-        [self doInitializationWithApplication:application installation:installation clientId:clientId tag:tag];
-    }
-    return self;
+    AVIMClientConfig *config = [AVIMClientConfig new];
+    config.application = [AVApplication defaultApplication];
+    config.installation = [AVInstallation defaultInstallation];
+    return [self initWithConfig:config clientId:clientId user:nil tag:tag cacheOption:cacheOption];
 }
 
 - (instancetype)initWithUser:(AVUser *)user
@@ -128,43 +116,51 @@
 
 - (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
 {
-    AVInstallation *installation = [AVInstallation defaultInstallation];
-    return [self initWithUser:user tag:tag installation:installation];
+    return [self initWithUser:user tag:tag cacheOption:nil];
 }
 
-- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
-                installation:(AVInstallation *)installation
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag cacheOption:(AVIMClientCacheOption *)cacheOption
 {
-    AVApplication *application = [AVApplication defaultApplication];
-    return [self initWithUser:user tag:tag installation:installation application:application];
+    AVIMClientConfig *config = [AVIMClientConfig new];
+    config.application = [AVApplication defaultApplication];
+    config.installation = [AVInstallation defaultInstallation];
+    return [self initWithConfig:config clientId:user.objectId user:user tag:tag cacheOption:cacheOption];
 }
 
-- (instancetype)initWithUser:(AVUser *)user tag:(NSString *)tag
-                installation:(AVInstallation *)installation
-                 application:(AVApplication *)application
+- (instancetype)initWithConfig:(AVIMClientConfig *)config
+                      clientId:(NSString *)clientId
+                          user:(AVUser *)user
+                           tag:(NSString *)tag
+                   cacheOption:(AVIMClientCacheOption *)cacheOption
 {
     self = [super init];
     if (self) {
         self->_user = user;
-        NSString *clientId = user.objectId;
-        [self doInitializationWithApplication:application installation:installation clientId:clientId tag:tag];
+        [self doInitializationWithConfig:config clientId:clientId tag:tag cacheOption:cacheOption];
     }
     return self;
 }
 
-- (void)doInitializationWithApplication:(AVApplication *)application
-                           installation:(AVInstallation *)installation
-                               clientId:(NSString *)clientId
-                                    tag:(NSString *)tag
+- (void)doInitializationWithConfig:(AVIMClientConfig *)config clientId:(NSString *)clientId tag:(NSString *)tag cacheOption:(AVIMClientCacheOption *)cacheOption
 {
-    NSParameterAssert(application.identifier.length && application.key.length);
-    NSParameterAssert(installation);
+    NSParameterAssert(config.application.identifier.length && config.application.key.length && config.installation);
     NSAssert(clientId.length >= 1 && clientId.length <= kClientIdLengthLimit, @"clientId's length should in range [1 %lu].", kClientIdLengthLimit);
     NSAssert(![tag isEqualToString:kClientTagReserved], @"%@ is reserved, should not use it.", kClientTagReserved);
     
-    self->_application = application;
+    self->_application = config.application;
     self->_clientId = [clientId copy];
     self->_tag = [tag copy];
+    self->_cacheOption = ({
+        AVIMClientCacheOption *option = [AVIMClientCacheOption new];
+        if (cacheOption) {
+            option.conversationCacheEnabled = cacheOption.conversationCacheEnabled;
+            option.messageCacheEnabled = cacheOption.messageCacheEnabled;
+        } else {
+            option.conversationCacheEnabled = true;
+            option.messageCacheEnabled = true;
+        }
+        option;
+    });
     
     self->_status = AVIMClientStatusNone;
     
@@ -174,14 +170,14 @@
          LCIMSessionConfigOptions_TransientACK |
          LCIMSessionConfigOptions_CallbackResultSlice);
     });
-    self->_offLineEventsNotificationEnabled = false;
+//    self->_offLineEventsNotificationEnabled = false;
     self->_sessionToken = nil;
     self->_sessionTokenExpireTimestamp = 0;
     self->_lastPatchTimestamp = 0;
     self->_lastUnreadTimestamp = 0;
     self->_isInSessionOpenHandshaking = false;
     
-    self->_messageQueryCacheEnabled = true;
+    self.messageQueryCacheEnabled = true;
     
     self->_internalSerialQueue = ({
         NSString *className = NSStringFromClass(self.class);
@@ -211,16 +207,16 @@
     
     self->_conversationManager = [[AVIMClientInternalConversationManager alloc] initWithClient:self];
     
-    self->_pushManager = [[AVIMClientPushManager alloc] initWithInstallation:installation client:self];
+    self->_pushManager = [[AVIMClientPushManager alloc] initWithInstallation:config.installation client:self];
     
-    self->_conversationCache = ({
-        LCIMConversationCache *cache = [[LCIMConversationCache alloc] initWithClientId:self->_clientId];
-        cache.client = self;
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [cache cleanAllExpiredConversations];
-        });
-        cache;
-    });
+//    self->_conversationCache = ({
+//        LCIMConversationCache *cache = [[LCIMConversationCache alloc] initWithClientId:self->_clientId];
+//        cache.client = self;
+//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//            [cache cleanAllExpiredConversations];
+//        });
+//        cache;
+//    });
 }
 
 - (void)dealloc
@@ -1484,15 +1480,15 @@ static void get_cid_initBy_mArray(AVIMGenericCommand *command, NSDictionary *jso
 
 // MARK: - RTM Notifications
 
-- (void)setOffLineEventsNotificationEnabled:(BOOL)offLineEventsNotificationEnabled
-{
-    if (offLineEventsNotificationEnabled) {
-        self->_sessionConfigBitmap = (self->_sessionConfigBitmap | LCIMSessionConfigOptions_ReliableNotification);
-    } else {
-        self->_sessionConfigBitmap = (self->_sessionConfigBitmap & ~LCIMSessionConfigOptions_ReliableNotification);
-    }
-    self->_offLineEventsNotificationEnabled = offLineEventsNotificationEnabled;
-}
+//- (void)setOffLineEventsNotificationEnabled:(BOOL)offLineEventsNotificationEnabled
+//{
+//    if (offLineEventsNotificationEnabled) {
+//        self->_sessionConfigBitmap = (self->_sessionConfigBitmap | LCIMSessionConfigOptions_ReliableNotification);
+//    } else {
+//        self->_sessionConfigBitmap = (self->_sessionConfigBitmap & ~LCIMSessionConfigOptions_ReliableNotification);
+//    }
+//    self->_offLineEventsNotificationEnabled = offLineEventsNotificationEnabled;
+//}
 
 - (void)fetchRTMNotificationsWithSessionToken:(NSString *)sessionToken
                                      clientId:(NSString *)clientId
@@ -1536,9 +1532,9 @@ static void get_cid_initBy_mArray(AVIMGenericCommand *command, NSDictionary *jso
 {
     AssertRunInQueue(self->_internalSerialQueue);
     
-    if (!self->_offLineEventsNotificationEnabled) {
-        return;
-    }
+//    if (!self->_offLineEventsNotificationEnabled) {
+//        return;
+//    }
     NSString *sessionToken = self->_sessionToken;
     if (!sessionToken) {
         return;
@@ -2151,5 +2147,13 @@ static void get_cid_initBy_mArray(AVIMGenericCommand *command, NSDictionary *jso
     }
     [AVIMClient.sessionProtocolOptions addEntriesFromDictionary:userOptions];
 }
+
+@end
+
+@implementation AVIMClientCacheOption
+
+@end
+
+@implementation AVIMClientConfig
 
 @end

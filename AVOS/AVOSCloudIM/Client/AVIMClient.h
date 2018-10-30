@@ -15,9 +15,17 @@
 @class AVIMTemporaryConversation;
 @class AVIMKeyedConversation;
 @class AVIMConversationQuery;
+@class AVIMConversationCache;
 @protocol AVIMSignatureDataSource;
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface AVIMClientCacheOption : NSObject
+
+@property (nonatomic, assign, readwrite) BOOL conversationCacheEnabled;
+@property (nonatomic, assign, readwrite) BOOL messageCacheEnabled;
+
+@end
 
 @interface AVIMClient : NSObject
 
@@ -39,12 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  No thread-safe for getter & setter. recommend setting after instantiation.
  */
-@property (nonatomic, weak, nullable) id <AVIMClientDelegate> delegate;
+@property (nonatomic, weak, readwrite, nullable) id<AVIMClientDelegate> delegate;
 
 /*
  No thread-safe for getter & setter. recommend setting after instantiation.
  */
-@property (nonatomic, weak, nullable) id <AVIMSignatureDataSource> signatureDataSource;
+@property (nonatomic, weak, readwrite, nullable) id<AVIMSignatureDataSource> signatureDataSource;
 
 /**
  The ID of this Client.
@@ -67,9 +75,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign, readonly) AVIMClientStatus status;
 
 /**
- 控制是否打开历史消息查询本地缓存的功能, 默认开启
+ The conversation cache manager of this client,
+ If `conversationCacheEnabled` is false, then it's nil.
  */
-@property (nonatomic, assign) BOOL messageQueryCacheEnabled;
+@property (nonatomic, strong, readonly, nullable) AVIMConversationCache *conversationCache;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -95,6 +104,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag;
 
+- (instancetype)initWithClientId:(NSString *)clientId tag:(NSString * _Nullable)tag cacheOption:(AVIMClientCacheOption * _Nullable)cacheOption;
+
 /**
  Initialization method.
 
@@ -113,6 +124,8 @@ NS_ASSUME_NONNULL_BEGIN
  @return Instance.
  */
 - (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag;
+
+- (instancetype)initWithUser:(AVUser *)user tag:(NSString * _Nullable)tag cacheOption:(AVIMClientCacheOption * _Nullable)cacheOption;
 
 /**
  Start a Session with Server.
@@ -205,57 +218,6 @@ NS_ASSUME_NONNULL_BEGIN
                       temporaryTTL:(int32_t)temporaryTTL
                           callback:(void (^)(AVIMConversation * _Nullable conversation, NSError * _Nullable error))callback;
 
-/**
- Get a Exist Conversation Retained by this Client.
- Thread-safe & Sync.
- 
- @param conversationId conversationId
- @return if the Conversation Exist, return the Instance; if not, return nil.
- */
-- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId;
-
-
-/**
- Get Conversations Retained by this Client.
- Thread-safe & Async.
-
- @param conversationIds ID array.
- @param callback Result.
- */
-- (void)getConversationsFromMemoryWith:(NSArray<NSString *> *)conversationIds
-                              callback:(void (^)(NSArray<AVIMConversation *> * _Nullable conversations))callback;
-
-/**
- Remove Conversations Retained by this Client.
- Thread-safe & Async.
- 
- @param conversationIds Array of conversation's ID
- @param callback Result of Callback, always means success.
- */
-- (void)removeConversationsInMemoryWith:(NSArray<NSString *> *)conversationIds
-                               callback:(void (^)(void))callback;
-
-/**
- Remove all Conversations Retained by this Client.
- Thread-safe & Async.
- 
- @param callback Result of Callback, always means success.
- */
-- (void)removeAllConversationsInMemoryWith:(void (^)(void))callback;
-
-/*!
- 创建一个绑定到当前 client 的会话。
- @param keyedConversation AVIMKeyedConversation 对象。
- @return 已绑定到当前 client 的会话。
- */
-- (AVIMConversation * _Nullable)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation;
-
-/*!
- 构造一个对话查询对象
- @return 对话查询对象.
- */
-- (AVIMConversationQuery *)conversationQuery;
-
 /*!
  Query online clients within the given array of clients.
 
@@ -267,16 +229,31 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)queryOnlineClientsInClients:(NSArray<NSString *> *)clients
                            callback:(void (^)(NSArray<NSString *> * _Nullable clientIds, NSError * _Nullable error))callback;
 
+/*!
+ 构造一个对话查询对象
+ @return 对话查询对象.
+ */
+- (AVIMConversationQuery *)conversationQuery;
+
 @end
 
 @interface AVIMClient (deprecated)
 
-/*!
- * 设置用户选项。
- * 该接口用于控制 AVIMClient 的一些细节行为。
- * @param userOptions 用户选项。
- */
-+ (void)setUserOptions:(NSDictionary *)userOptions __deprecated_msg("deprecated. Do not use it any more.");
+@property (nonatomic, assign, readwrite) BOOL messageQueryCacheEnabled __deprecated_msg("deprecated.");
+
++ (void)setUserOptions:(NSDictionary *)userOptions __deprecated_msg("deprecated.");
+
+- (AVIMConversation * _Nullable)conversationForId:(NSString *)conversationId __deprecated_msg("deprecated.");
+
+- (void)getConversationsFromMemoryWith:(NSArray<NSString *> *)conversationIds
+                              callback:(void (^)(NSArray<AVIMConversation *> * _Nullable conversations))callback __deprecated_msg("deprecated.");
+
+- (void)removeConversationsInMemoryWith:(NSArray<NSString *> *)conversationIds
+                               callback:(void (^)(void))callback __deprecated_msg("deprecated.");
+
+- (void)removeAllConversationsInMemoryWith:(void (^)(void))callback __deprecated_msg("deprecated.");
+
+- (AVIMConversation * _Nullable)conversationWithKeyedConversation:(AVIMKeyedConversation *)keyedConversation __deprecated_msg("deprecated.");
 
 @end
 

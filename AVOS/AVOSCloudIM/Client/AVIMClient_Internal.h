@@ -16,28 +16,31 @@
 @class AVIMSignature;
 @class AVApplication;
 
+@interface AVIMClientConfig : NSObject
+
+@property (nonatomic, strong, readwrite) AVApplication *application;
+@property (nonatomic, strong, readwrite) AVInstallation *installation;
+
+@end
+
 @interface AVIMClient () <AVIMWebSocketWrapperDelegate>
 
 @property (nonatomic, strong, readonly) AVApplication *application;
+@property (nonatomic, strong, readonly) AVIMClientPushManager *pushManager;
 @property (nonatomic, strong, readonly) dispatch_queue_t internalSerialQueue;
 @property (nonatomic, strong, readonly) dispatch_queue_t signatureQueue;
 @property (nonatomic, strong, readonly) dispatch_queue_t userInteractQueue;
 @property (nonatomic, strong, readonly) AVIMWebSocketWrapper *socketWrapper;
+@property (nonatomic, strong, readonly) AVIMClientCacheOption *cacheOption;
 @property (nonatomic, strong, readonly) AVIMClientInternalConversationManager *conversationManager;
-@property (nonatomic, strong, readonly) AVIMClientPushManager *pushManager;
-@property (nonatomic, strong, readonly) LCIMConversationCache *conversationCache;
-
-@property (nonatomic, assign) BOOL offLineEventsNotificationEnabled;
 
 + (NSMutableDictionary *)sessionProtocolOptions;
 
-- (instancetype)initWithClientId:(NSString *)clientId
-                             tag:(NSString *)tag
-                    installation:(AVInstallation *)installation;
-
-- (instancetype)initWithUser:(AVUser *)user
-                         tag:(NSString *)tag
-                installation:(AVInstallation *)installation;
+- (instancetype)initWithConfig:(AVIMClientConfig *)config
+                      clientId:(NSString *)clientId
+                          user:(AVUser *)user
+                           tag:(NSString *)tag
+                   cacheOption:(AVIMClientCacheOption *)cacheOption;
 
 - (void)addOperationToInternalSerialQueue:(void (^)(AVIMClient *client))block;
 
