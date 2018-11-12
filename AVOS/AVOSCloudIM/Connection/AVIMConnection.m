@@ -261,9 +261,11 @@
         NSOperationQueue *operationQueue = [NSOperationQueue new];
         operationQueue.underlyingQueue = _serialQueue;
         _enterBackgroundObserver = [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationDidEnterBackgroundNotification object:nil queue:operationQueue usingBlock:^(NSNotification * _Nonnull note) {
+            AVLoggerInfo(AVLoggerDomainIM, @"Application did enter background");
             [weakSelf appStateChanged:true];
         }];
         _enterForegroundObserver = [NSNotificationCenter.defaultCenter addObserverForName:UIApplicationWillEnterForegroundNotification object:nil queue:operationQueue usingBlock:^(NSNotification * _Nonnull note) {
+            AVLoggerInfo(AVLoggerDomainIM, @"Application will enter foreground");
             [weakSelf appStateChanged:false];
         }];
 #endif
@@ -272,6 +274,7 @@
         _previousReachabilityStatus = _reachabilityManager.networkReachabilityStatus;
         [_reachabilityManager setReachabilityStatusChangeDispatchQueue:_serialQueue];
         [_reachabilityManager setReachabilityStatusChangeBlock:^(AVIMNetworkReachabilityStatus status) {
+            AVLoggerInfo(AVLoggerDomainIM, @"Network status change to %@", AVIMStringFromNetworkReachabilityStatus(status));
             [weakSelf networkReachabilityStatusChanged:status];
         }];
         [_reachabilityManager startMonitoring];
@@ -375,7 +378,7 @@
                         UInt16 index = outCommand.i;
                         [self.timer insertCommandCallback:commandCallback index:index];
                     }
-                    AVLoggerInfo(AVLoggerDomainIM, LCIM_OUT_COMMAND_LOG_FORMAT, [outCommand avim_description]);
+                    AVLoggerDebug(AVLoggerDomainIM, LCIM_OUT_COMMAND_LOG_FORMAT, [outCommand avim_description]);
                     [self.socket send:data];
                 } else {
                     errorCallback(AVIMErrorCodeCommandDataLengthTooLong);
@@ -457,6 +460,7 @@
             });
         } else {
             if (error) {
+                AVLoggerInfo(AVLoggerDomainIM, @"Get RTM server URL failed: %@", error);
                 dispatch_async(self.delegateQueue, ^{
                     [self.delegate connection:self didFailInConnectingWithEvent:error];
                 });
@@ -468,6 +472,7 @@
                 [self.socket setDelegateDispatchQueue:self.serialQueue];
                 [self.socket setDelegate:self];
                 [self.socket open];
+                AVLoggerInfo(AVLoggerDomainIM, @"%@ connecting URL<\"%@\"> with protocol<\"%@\">", self.socket, URL, self.lcimProtocol);
                 dispatch_async(self.delegateQueue, ^{
                     [self.delegate connectionInConnecting:self];
                 });
@@ -525,8 +530,10 @@
 {
     AssertRunInQueue(self.serialQueue);
     NSParameterAssert(self.socket == webSocket && self.timer == nil);
+    AVLoggerInfo(AVLoggerDomainIM, @"%@ open success", webSocket);
     self.timer = [[AVIMConnectionTimer alloc] initWithTimerQueue:self.serialQueue commandCallbackQueue:self.delegateQueue pingSentBlock:^(AVIMConnectionTimer *timer) {
         [webSocket sendPing:[NSData data]];
+        AVLoggerInfo(AVLoggerDomainIM, @"%@ ping sent", webSocket);
     }];
     dispatch_async(self.delegateQueue, ^{
         [self.delegate connectionDidConnect:self];
@@ -537,6 +544,7 @@
 {
     AssertRunInQueue(self.serialQueue);
     NSParameterAssert(self.socket == webSocket);
+    AVLoggerInfo(AVLoggerDomainIM, @"%@ closed with error: %@", webSocket, error);
     if ([error.domain isEqualToString:AVIMWebSocketErrorDomain]) {
         if (error.code == 2132) {
             // HTTP upgrade failed, maybe should use another server.
@@ -560,6 +568,7 @@
     NSDictionary *userInfo = @{ NSLocalizedFailureReasonErrorKey : (reason ?: @"unknown reason"),
                                 @"wasClean" : @(wasClean) };
     NSError *error = [NSError errorWithDomain:AVIMWebSocketErrorDomain code:code userInfo:userInfo];
+    AVLoggerInfo(AVLoggerDomainIM, @"%@ closed with error: %@", webSocket, error);
     [self handleWebSocketClosedWithError:error];
     if (!wasClean && self.isAutoReconnectionEnabled) {
         // not was clean means not close by server, so should try reconnecting.
@@ -577,7 +586,7 @@
         AVLoggerError(AVLoggerDomainIM, @"%@", error);
         return;
     }
-    AVLoggerInfo(AVLoggerDomainIM, LCIM_IN_COMMAND_LOG_FORMAT, [inCommand avim_description]);
+    AVLoggerDebug(AVLoggerDomainIM, LCIM_IN_COMMAND_LOG_FORMAT, [inCommand avim_description]);
     if (inCommand.hasI) {
         [self.timer handleCallbackCommand:inCommand];
     } else {
@@ -591,6 +600,7 @@
 {
     AssertRunInQueue(self.serialQueue);
     NSParameterAssert(self.socket == webSocket && self.timer);
+    AVLoggerInfo(AVLoggerDomainIM, @"%@ pong received", webSocket);
     self.timer.lastPongReceivedTimestamp = [[NSDate date] timeIntervalSince1970];
 }
 
